@@ -1,6 +1,6 @@
-import Text from '@components/default/Text';
-import { ETextType } from '@components/default/Text/Text.enum';
 import Flex from '@components/layout/Flex';
+import Text from '@components/shared/Text';
+import { ETextType } from '@components/shared/Text/Text.enum';
 import { EMediaQuery, ESize } from 'theme/theme.enum';
 import WalletButton from '../WalletButton';
 import { StyledNavbar } from './Navbar.styles';

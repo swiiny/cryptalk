@@ -1,4 +1,4 @@
-import Navbar from '@components/default/Navbar';
+import Navbar from '@components/navbar/Navbar';
 import ResponsiveProvider from '@contexts/ResponsiveContext';
 import Web3Provider from '@contexts/Web3Context';
 import type { AppProps } from 'next/app';

@@ -1,4 +1,4 @@
-import Meta from '@components/common/Meta';
+import Meta from '@components/shared/Meta';
 import { FC } from 'react';
 import { StyledMainContainer } from './HomePage.styles';
 import { IHomePage } from './HomePage.type';

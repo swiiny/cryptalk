@@ -1,6 +1,6 @@
-import React, { FC, useEffect } from 'react';
-import Meta from '@components/common/Meta';
+import Meta from '@components/shared/Meta';
 import { useRouter } from 'next/router';
+import { FC, useEffect } from 'react';
 
 const Error500: FC = () => {
 	const router = useRouter();

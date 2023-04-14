@@ -1,6 +1,6 @@
-import Meta from '@components/common/Meta';
+import Meta from '@components/shared/Meta';
 import { useRouter } from 'next/router';
-import React, { FC, useEffect } from 'react';
+import { FC, useEffect } from 'react';
 
 const Error404: FC = () => {
 	const router = useRouter();

@@ -5,7 +5,7 @@ import useWeb3 from '@hooks/useWeb3';
 
 import { MdOutlineAccountBalanceWallet } from 'react-icons/md';
 import { useTheme } from 'styled-components';
-import Button from '../Button';
+import Button from '../../shared/Button';
 import WalletModal from '../WalletModal';
 
 const WalletButton: FC<IWalletButton> = () => {

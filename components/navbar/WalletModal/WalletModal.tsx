@@ -1,13 +1,13 @@
-import Portal from '@components/common/Portal';
 import { EFlex } from '@components/layout/Flex/Flex.enum';
+import Portal from '@components/shared/Portal';
 import { WALLETS_ARRAY } from '@contexts/Web3Context/Web3Context.variables';
 import useWeb3 from '@hooks/useWeb3';
 import Image from 'next/image';
 import { FC, MouseEvent, useEffect, useId, useState } from 'react';
 import { ESize } from 'theme/theme.enum';
-import GradientContainer from '../GradientContainer';
-import Text from '../Text';
-import { EFontWeight, ETextAlign } from '../Text/Text.enum';
+import GradientContainer from '../../shared/GradientContainer';
+import Text from '../../shared/Text';
+import { EFontWeight, ETextAlign } from '../../shared/Text/Text.enum';
 import { StyledModalBackground, StyledModalButton } from './WalletModal.styles';
 import { IWalletModal } from './WalletModal.type';
 
