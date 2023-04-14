@@ -132,23 +132,43 @@ const ChatInput: FC<IChatInput> = () => {
 		const initialPrompt = `User wants to execute a swap. They said: '${initialUserInput}'.\n`;
 		let currentPrompt = initialPrompt;
 		let userResponse = '';
-		let userIntent = null;
+		let userIntent: TCurrentUserInfo | null = null;
 
 		pushMessage(EUser.user, initialUserInput);
 
-		console.log('isComplete(userIntent)', isComplete(userIntent));
-
 		async function askOpenAi() {
 			console.log('start iterations');
-			// Replace the getOpenAIResponse function call with the openAIMutation.mutate function
 			let newPrompt = '';
 
 			let newQuestion =
 				currentPrompt +
-				" When providing a response, also include a code-parsable string with the format 'responseForCode: tokenA, tokenB, amount, slippage'.";
+				" How should the AI bot ask the user for any missing swap data (tokenA, tokenB, amount, slippage)? Make sure to include a code-parsable string at the end of your response with user selected values or null in the format 'responseForCode: tokenA, tokenB, amount, slippage'. ";
+
+			const { tokenA, tokenB, amount, slippage } = userIntent || {
+				tokenA: null,
+				tokenB: null,
+				amount: null,
+				slippage: null
+			};
+
+			/* 		conversationHistory += `Context: The user wants to swap tokens. So far, they have provided the following information:\n`;
+			conversationHistory += `TokenA: ${tokenA}\n`;
+			conversationHistory += `TokenB: ${tokenB}\n`;
+			conversationHistory += `Amount: ${amount}\n`;
+			conversationHistory += `Slippage: ${slippage}\n`;
 
 			console.log('conversationHistory', conversationHistory);
-			newPrompt = `${conversationHistory}${newQuestion}, How should the AI bot ask the user for missing swap data (tokenA, tokenB, amount, slippage)? `;
+			newPrompt = `${conversationHistory}${newQuestion} `; */
+
+			let contextSummary = '';
+			contextSummary += `Context: The user wants to swap tokens. So far, they have provided the following information:\n`;
+			contextSummary += `TokenA: ${tokenA}\n`;
+			contextSummary += `TokenB: ${tokenB}\n`;
+			contextSummary += `Amount: ${amount}\n`;
+			contextSummary += `Slippage: ${slippage}\n`;
+
+			console.log('contextSummary', contextSummary);
+			newPrompt = `${contextSummary}${newQuestion} `;
 
 			openAIMutation.mutate(newPrompt, {
 				onSuccess: async (aiResponse) => {
@@ -159,14 +179,20 @@ const ChatInput: FC<IChatInput> = () => {
 
 					userIntent = extractUserIntentFromResponse(aiResponse);
 
-					const { tokenA, tokenB, amount, slippage } = userIntent;
+					// check if the user has confirmed the information
+					if (userResponse.includes('CONFIRMED')) {
+						alert("it's confirmed");
+						// can build the tx
+						return;
+					}
 
 					if (isComplete(userIntent)) {
 						// can build the tx
 						return;
 					}
 
-					currentPrompt = `Continue the conversation based on the user's response: '${userResponse}'. Current responseForCode: tokenA='${tokenA}', tokenB='${tokenB}', amount=${amount}, slippage=${slippage}. `;
+					//currentPrompt = `Continue the conversation based on the user's response: '${userResponse}'. `;
+					currentPrompt = `Continue the conversation based on the user's response: '${userResponse}'. If the user has confirmed the information, automatically include the word "CONFIRMED" in your response. `;
 
 					askOpenAi();
 				}
