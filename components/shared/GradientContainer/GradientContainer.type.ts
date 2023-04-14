@@ -1,4 +1,4 @@
-import { IFlex } from '@components/layout/Flex/Flex.type';
+import { IFlex } from '@components/shared/layout/Flex/Flex.type';
 
 interface IGradientContainer extends IFlex {}
 

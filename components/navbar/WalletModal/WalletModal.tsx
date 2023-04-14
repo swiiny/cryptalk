@@ -1,5 +1,5 @@
-import { EFlex } from '@components/layout/Flex/Flex.enum';
 import Portal from '@components/shared/Portal';
+import { EFlex } from '@components/shared/layout/Flex/Flex.enum';
 import { WALLETS_ARRAY } from '@contexts/Web3Context/Web3Context.variables';
 import useWeb3 from '@hooks/useWeb3';
 import Image from 'next/image';

@@ -1,4 +1,4 @@
-import { EFlex } from '@components/layout/Flex/Flex.enum';
+import { EFlex } from '@components/shared/layout/Flex/Flex.enum';
 import { ESize } from '@theme/theme.enum';
 import { FC, useMemo, useState } from 'react';
 import { MdOutlineCheck, MdOutlineContentCopy } from 'react-icons/md';

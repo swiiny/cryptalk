@@ -1,4 +1,4 @@
-import Flex from '@components/layout/Flex';
+import Flex from '@components/shared/layout/Flex';
 import styled, { css } from 'styled-components';
 
 export const StyledGradientContainer = styled(Flex)`
