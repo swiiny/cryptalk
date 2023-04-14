@@ -19,15 +19,15 @@
 
 ## TODO
 
-- [] conversation UI
-  - [ ] user input
-  - [] chat box with bot
-  - [] buttons
+- [x] conversation UI
+  - [x] user input
+  - [x] chat box with bot
+  - [x] buttons + input
 - [] swap logic using 1inch fusion SDK
 - [] define decision tree for bot
   - [] what the user want to do
     - [] if not a swap then tell the user the bot can't do that
-    - [] if a swap then ask for the token to swap from
-    - [] if a swap then ask for the token to swap to
-    - [] if a swap then ask for the amount to swap
+    - [x] if a swap then ask for the token to swap from
+    - [x] if a swap then ask for the token to swap to
+    - [x] if a swap then ask for the amount to swap
     - [] if a swap then ask for the network to swap on

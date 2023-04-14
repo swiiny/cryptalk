@@ -1,36 +1,38 @@
-import { QueryClient, useMutation, useQueryClient } from '@tanstack/react-query';
-import { v4 as uuidv4 } from 'uuid';
-import { pushNewMessage } from '../useMessagesQuery/useMessagesQuery';
-import { IMessage } from '../useMessagesQuery/useMessagesQuery.type';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMessagesQuery } from '../useMessagesQuery/useMessagesQuery';
 
-export async function sendMessageToOpenAI(input: string, queryClient: QueryClient): Promise<string> {
-	const newMessage: IMessage = {
-		id: uuidv4(),
-		user: 'User',
-		value: input,
-		timestamp: Date.now()
-	};
+export async function sendMessageToOpenAI(prompt: string): Promise<string> {
+	// Send the message to the API route
+	const response = await fetch('/api/openai', {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json'
+		},
+		body: JSON.stringify({ prompt })
+	});
 
-	// Update the messages query cache on successful mutation
-	pushNewMessage(newMessage, queryClient);
+	const data = await response.json();
 
-	// Replace this with the actual API call to send a message to OpenAI and get the response
-	return 'test response value';
+	return data.response;
 }
 
 export const useOpenAIMutation = () => {
 	const queryClient = useQueryClient();
+	const { conversationHistory } = useMessagesQuery();
 
-	return useMutation<string, Error, string>((userInput: string) => sendMessageToOpenAI(userInput, queryClient), {
-		onSuccess: (data: string) => {
-			const newMessage: IMessage = {
-				id: uuidv4(),
-				user: 'gpt-3.5',
-				value: data,
-				timestamp: Date.now()
-			};
+	return useMutation<string, Error, string>(
+		sendMessageToOpenAI /* ,
+		{
+			onSuccess: (data: string) => {
+				const newMessage: IMessage = {
+					id: uuidv4(),
+					user: 'gpt-3.5',
+					value: formatResponse(data),
+					timestamp: Date.now()
+				};
 
-			pushNewMessage(newMessage, queryClient);
-		}
-	});
+				pushNewMessage(newMessage, queryClient);
+			}
+		} */
+	);
 };

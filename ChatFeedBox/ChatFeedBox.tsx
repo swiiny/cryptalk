@@ -13,7 +13,7 @@ const ChatFeedBox: FC<IChatFeedBox> = ({ id, user, value, timestamp }) => {
 	const isUser = user === 'User';
 
 	return (
-		<StyledChatFeedBox isLeft={!isUser} marginBottom={24}>
+		<StyledChatFeedBox className={!isUser ? 'is-left' : 'is-right'}>
 			<GradientContainer
 				borderRadius={'6px'}
 				paddingY={4}
