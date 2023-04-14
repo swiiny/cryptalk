@@ -1,9 +1,11 @@
 import { QueryClient, useMutation, useQueryClient } from '@tanstack/react-query';
+import { v4 as uuidv4 } from 'uuid';
 import { pushNewMessage } from '../useMessagesQuery/useMessagesQuery';
 import { IMessage } from '../useMessagesQuery/useMessagesQuery.type';
 
 export async function sendMessageToOpenAI(input: string, queryClient: QueryClient): Promise<string> {
 	const newMessage: IMessage = {
+		id: uuidv4(),
 		user: 'User',
 		value: input,
 		timestamp: Date.now()
@@ -22,6 +24,7 @@ export const useOpenAIMutation = () => {
 	return useMutation<string, Error, string>((userInput: string) => sendMessageToOpenAI(userInput, queryClient), {
 		onSuccess: (data: string) => {
 			const newMessage: IMessage = {
+				id: uuidv4(),
 				user: 'gpt-3.5',
 				value: data,
 				timestamp: Date.now()

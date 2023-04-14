@@ -1,9 +1,13 @@
-import React, { FC } from 'react';
-import { IGradientContainer } from './GradientContainer.type';
+import { FC } from 'react';
 import { StyledGradientContainer } from './GradientContainer.styles';
+import { IGradientContainer } from './GradientContainer.type';
 
-const GradientContainer: FC<IGradientContainer> = ({ children, ...otherProps }) => {
-	return <StyledGradientContainer {...otherProps}>{children}</StyledGradientContainer>;
+const GradientContainer: FC<IGradientContainer> = ({ children, borderRadius, background, ...otherProps }) => {
+	return (
+		<StyledGradientContainer borderRadius={borderRadius} background={background} {...otherProps}>
+			{children}
+		</StyledGradientContainer>
+	);
 };
 
 export { GradientContainer };

@@ -4,5 +4,5 @@ export const StyledChatContainer = styled.div`
 	position: relative;
 	height: 90%;
 	width: 100%;
-	max-width: 600px;
+	max-width: 400px;
 `;
