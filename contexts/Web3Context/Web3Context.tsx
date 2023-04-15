@@ -189,13 +189,57 @@ const Web3Provider: FC<{ children: ReactNode }> = ({ children }) => {
 
 				if (resolver) {
 					setEns(resolver);
+					return resolver;
 				}
+
+				return undefined;
 			} catch (err) {
 				console.error('Error while getting ENS', err);
+				return undefined;
 			}
 		}
 	}, []);
 
+	/* 	
+	function random(max) {
+		const randomBuffer = randomBytes(32);
+		const randomBN = ethers.BigNumber.from(randomBuffer);
+		return randomBN.mod(max).toNumber();
+	}
+
+function createFusionOrder(input, maker: string) {
+		console.log('input', input);
+		const salt = new AuctionSalt({
+			duration: input.presets[input.recommendedPreset].auctionDuration,
+			auctionStartTime: Math.floor(Date.now() / 1000) + input.presets[input.recommendedPreset].startAuctionIn,
+			initialRateBump: input.presets[input.recommendedPreset].initialRateBump,
+			bankFee: input.presets[input.recommendedPreset].bankFee,
+			salt: random(100000).toString()
+		});
+
+		const suffix = new AuctionSuffix({
+			points: input.presets[input.recommendedPreset].points,
+			whitelist: input.whitelist.map((address) => ({ address, allowance: 0 }))
+		});
+
+		const order = new FusionOrder(
+			{
+				makerAsset: input.params.fromTokenAddress,
+				takerAsset: input.params.toTokenAddress,
+				makingAmount: input.fromTokenAmount,
+				takingAmount: input.toTokenAmount,
+				maker: maker
+			},
+			salt,
+			suffix
+		);
+
+		return {
+			order,
+			quoteId: input.quoteId
+		};
+	}
+ */
 	const fusionSwap = useCallback(
 		async ({ tokenA, tokenB, amount, minimumReceived, slippage }: IFormattedSwapData) => {
 			try {
@@ -225,93 +269,40 @@ const Web3Provider: FC<{ children: ReactNode }> = ({ children }) => {
 					await wrapNativeToken(wrappedNativeTokenAddress, amount, provider.web3Provider);
 				}
 
-				/* const blockchainProvider = new sdk.api.({
-					provider: provider.web3Provider
-				});
- */
-
-				/* 		{
-						fromTokenAddress: '0xbd1463f02f61676d53fd183c2b19282bff93d099',
-						toTokenAddress: '0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270',
-						amount: '267650763756631830',
-						walletAddress: '0x344A821f89b71E96B7e2f7af5a42d45b474D041e'
-					}
- */
-				tokenA.address = '0xbd1463f02f61676d53fd183c2b19282bff93d099';
-				tokenB.address = '0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270';
-				amount = '267650763756631830';
-
-				//const signer = provider?.web3Instance?.getSigner();
-
 				const sdk = new FusionSDK({
 					url: 'https://fusion.1inch.io',
 					network: networkId,
 					blockchainProvider: provider.web3Instance
 				});
-
-				const order = await sdk.createOrder({
+				/*
+				
+				const quote = await sdk.getQuote({
 					fromTokenAddress: tokenA.address,
 					toTokenAddress: tokenB.address,
-
-					amount: amount,
-					walletAddress: address.toString()
+					amount: amount
 				});
 
-				console.log('order', order);
-				/* 
-				// Sign the typed data
-				const signature = await provider.web3Instance.send('eth_signTypedData_v4', [
-					address.toString(),
-					JSON.stringify(order)
-				]);
- */
-				//console.log('signature', signature);
+				
+				const order = await sdk
+					.createOrder({
+						fromTokenAddress: tokenA.address,
+						toTokenAddress: tokenB.address,
 
-				// Submit the order
-				//const submitOrderRes = await sdk.submitOrder(order.order, order.quoteId);
-				//console.log('submitOrderRes', submitOrderRes);
-				/* 
-				order: LimitOrderV3Struct;
-				signature: string;
-				quoteId: string;
-				orderHash: string; */
+						amount: amount,
+						walletAddress: address.toString()
+					})
+					.then(console.log)
+					.catch(console.error); */
 
-				/* 				export declare type OrderParams = {
-    fromTokenAddress: string;
-    toTokenAddress: string;
-    amount: string;
-    walletAddress: string;
-    permit?: string;
-    receiver?: string;
-    preset?: PresetEnum;
-    nonce?: OrderNonce | string | number;
-    fee?: TakingFeeInfo;
-};
-
-			 */ //blockchainProvider;
-				//httpProvider;
-
-				/* 	console.log('networkId', networkId);
-
-				console.log('debug', { tokenA, tokenB, amount, minimumReceived, slippage });
-				sdk
+				const resPlacedOrder = await sdk
 					.placeOrder({
 						fromTokenAddress: tokenA.address,
 						toTokenAddress: tokenB.address,
 						amount: amount,
 						walletAddress: address.toString()
-					}) */
-				/* 
-				const res = sdk
-					.placeOrder({
-						fromTokenAddress: '0xbd1463f02f61676d53fd183c2b19282bff93d099',
-						toTokenAddress: '0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270',
-						amount: '267650763756631830',
-						walletAddress: '0x344A821f89b71E96B7e2f7af5a42d45b474D041e'
-					}) 
+					})
 					.then(console.log)
 					.catch(console.error);
-					*/
 			} catch (err) {
 				console.error(err);
 			}
@@ -328,12 +319,6 @@ const Web3Provider: FC<{ children: ReactNode }> = ({ children }) => {
 	}, [checkIfWalletIsConnected]);
 
 	useEffect(() => {
-		if (address) {
-			checkIfUserHasEns(address);
-		}
-	}, [address, checkIfUserHasEns]);
-
-	useEffect(() => {
 		console.debug('address', address?.toString());
 	}, [address]);
 
@@ -346,6 +331,17 @@ const Web3Provider: FC<{ children: ReactNode }> = ({ children }) => {
 	}, [isValidNetwork]);
 
 	useEffect(() => {
+		if (!address) {
+			const timeout = setTimeout(() => {
+				pushMessage(
+					EUser.bot,
+					'Please connect your wallet to interact with me 🦊\nOnce connected, I will be able to help you to swap tokens 🚀'
+				);
+			}, 1000);
+
+			return () => clearTimeout(timeout);
+		}
+
 		function pushMessage(user: EUser, message: string) {
 			const newMessage: IMessage = {
 				id: uuidv4(),
@@ -357,27 +353,21 @@ const Web3Provider: FC<{ children: ReactNode }> = ({ children }) => {
 			pushNewMessage(newMessage, queryClient);
 		}
 
-		// wait 3 seconds, if there is no address then send message to connect wallet
-		const timeout = setTimeout(() => {
-			if (!address) {
-				pushMessage(
-					EUser.bot,
-					'Please connect your wallet to interact with me 🦊\nOnce connected, I will be able to help you to swap tokens 🚀'
-				);
-			} else {
-				// remove last 4 chars from ens
-				const formattedEns = ens?.replace(/.{4}$/, '');
-				pushMessage(
-					EUser.bot,
-					`Hey ${
-						formattedEns || ''
-					} 👋\nI'm here to help you with your crypto needs 🚀\n\nYou can ask me about:\n- Swap tokens\n- List of tokens to swap`
-				);
-			}
-		}, 2000);
+		async function _getEnsAndSayHello() {
+			const _ens = await checkIfUserHasEns(address!);
 
-		return () => clearTimeout(timeout);
-	}, [address, queryClient, ens]);
+			// remove last 4 chars from ens
+			const formattedEns = _ens?.replace(/.{4}$/, '');
+			pushMessage(
+				EUser.bot,
+				`Hey ${
+					formattedEns || ''
+				} 👋\nI'm here to help you with your crypto needs 🚀\n\nYou can ask me about:\n- Swap tokens\n- List of tokens to swap`
+			);
+		}
+
+		_getEnsAndSayHello();
+	}, [address, checkIfUserHasEns, , queryClient]);
 
 	useEffect(() => {
 		if (address) {

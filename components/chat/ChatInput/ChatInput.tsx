@@ -15,7 +15,7 @@ import { StyledChatInput } from './ChatInput.styles';
 import { IChatInput, TSwapData } from './ChatInput.type';
 
 export enum EUser {
-	bot = 'GPT-3',
+	bot = 'dialogflow',
 	user = 'User'
 }
 
@@ -25,16 +25,23 @@ const ChatInput: FC<IChatInput> = () => {
 	const [message, setMessage] = useState('');
 	const { address, connectWallet } = useWeb3();
 	const [swapData, setSwapData] = useState<TSwapData>({});
-	/* const [swapData, setSwapData] = useState<TSwapData>({
-		tokenA: 'USDC',
-		tokenB: 'ETH',
-		amount: 1000,
-		slippage: 3,
-		isReadyToSwap: true
-	}); */
 	const [isConfirmationModalOpen, setConfirmationModalOpen] = useState(false);
-	const { mutate } = useDialogFlowMutation();
+	const { mutate: mutateDialogFlow } = useDialogFlowMutation();
 
+	/* 	useEffect(() => {
+		if (address) {
+			setSwapData({
+				tokenA: 'WMATIC',
+				tokenB: 'USDC',
+				amount: 1,
+				slippage: 3,
+				isReadyToSwap: true
+			});
+
+			setConfirmationModalOpen(true);
+		}
+	}, [address]);
+ */
 	function pushMessage(user: EUser, message: string) {
 		const newMessage: IMessage = {
 			id: uuidv4(),
@@ -60,7 +67,7 @@ const ChatInput: FC<IChatInput> = () => {
 
 	const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		mutate(
+		mutateDialogFlow(
 			{ message, sessionId: address?.toString() || 'unknown' },
 			{
 				onSuccess: (data) => {
@@ -68,8 +75,6 @@ const ChatInput: FC<IChatInput> = () => {
 					const parameters = data.parameters.fields;
 
 					const answer = data.fulfillmentText;
-
-					console.log('parameters', parameters);
 
 					switch (_intent) {
 						case EIndent.SwapTokens:
@@ -81,12 +86,6 @@ const ChatInput: FC<IChatInput> = () => {
 							setSwapData({ ...swapData, slippage: parameters.slippage.numberValue, isReadyToSwap: true });
 							pushMessage(EUser.bot, answer.replaceAll('[slippage]', parameters.slippage.numberValue.toString()));
 
-							/* setTimeout(() => {
-								pushMessage(
-									EUser.bot,
-									`You want to swap ${swapData.amount} ${swapData.tokenA} for ${swapData.tokenB} with a slippage of ${parameters.slippage.numberValue}%`
-								);
-							}, 500); */
 							setTimeout(() => {
 								setConfirmationModalOpen(true);
 							}, 500);
@@ -131,8 +130,6 @@ const ChatInput: FC<IChatInput> = () => {
 							console.log('user wants to see available tokens');
 						case EIndent.SpecifyNetwork:
 							const networkKey = parameters?.network?.stringValue;
-
-							console.log('networkKey', networkKey);
 
 							if (!networkKey) {
 								pushMessage(EUser.bot, "Sorry, I can't find this network.");
@@ -213,13 +210,14 @@ const ChatInput: FC<IChatInput> = () => {
 		formatTokensToEntity();
 	}, []); */
 
+	function onCloseModal() {
+		setConfirmationModalOpen(false);
+		setSwapData({});
+	}
+
 	return (
 		<>
-			<SwapConfirmationModal
-				isOpen={isConfirmationModalOpen}
-				onClose={() => setConfirmationModalOpen(false)}
-				swapData={swapData}
-			/>
+			<SwapConfirmationModal isOpen={isConfirmationModalOpen} onClose={() => onCloseModal()} swapData={swapData} />
 
 			<StyledChatInput>
 				{!address ? (

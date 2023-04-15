@@ -17,8 +17,9 @@ export const globalQueryConfig: QueryClientConfig = {
 	}
 };
 
-const CreateNextjsDapp = ({ Component, pageProps }: AppProps) => {
+const Cryptalk = ({ Component, pageProps }: AppProps) => {
 	const [queryClient] = useState(() => new QueryClient(globalQueryConfig));
+
 	return (
 		<>
 			<Head>
@@ -53,4 +54,4 @@ const CreateNextjsDapp = ({ Component, pageProps }: AppProps) => {
 	);
 };
 
-export default CreateNextjsDapp;
+export default Cryptalk;

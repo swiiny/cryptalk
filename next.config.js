@@ -4,7 +4,7 @@ const nextConfig = {
 	compiler: {
 		styledComponents: true, // ssr and displayName are configured by default
 		removeConsole: process.env.NODE_ENV === 'production', // remove all console.*
-		swcMinify: true // minify the bundle
+		swcMinify: true // minify the bundle,
 	},
 	exclude: ['node_modules'],
 	images: {

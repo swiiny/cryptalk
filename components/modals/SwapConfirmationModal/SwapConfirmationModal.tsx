@@ -10,7 +10,7 @@ import { useQuote } from '@hooks/1inch/useQuote/useQuote';
 import useWeb3 from '@hooks/useWeb3';
 import { tokens } from '@utils/tokens';
 import { ethers } from 'ethers';
-import { FC, MouseEvent, useEffect, useId, useMemo, useState } from 'react';
+import { FC, MouseEvent, useEffect, useId, useState } from 'react';
 import { useTheme } from 'styled-components';
 import { ESize } from 'theme/theme.enum';
 import GradientContainer from '../../shared/GradientContainer';
@@ -33,37 +33,28 @@ const SwapConfirmationModal: FC<ISwapConfirmationModal> = ({ isOpen = false, onC
 	const { tokenA: tokenASymbol, tokenB: tokenBSymbol, amount, slippage } = swapData;
 	const [formattedSwapData, setFormattedSwapData] = useState<IFormattedSwapData>();
 	const theme = useTheme();
+	const [swapError, setSwapError] = useState<string | null>(null);
 
 	const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
 
 	const isValidNetwork = networks.includes(networkId || 0);
 
-	const { isLoading, fromTokenAmount, toTokenAmount } = useQuote(
-		formattedSwapData?.tokenA.address,
-		formattedSwapData?.tokenB.address,
-		formattedSwapData?.amount,
-		networkId
-	);
+	const {
+		fromTokenAmount,
+		toTokenAmount,
+		fromTokenAmountInUSD,
+		toTokenAmountInUSD,
+		readableFromTokenAmount,
+		readableToTokenAmount
+	} = useQuote(formattedSwapData?.tokenA.address, formattedSwapData?.tokenB.address, formattedSwapData?.amount);
 
 	const uuid = useId();
-
-	const formattedToAmount = useMemo(() => {
-		let _amount = ethers.utils.formatUnits(toTokenAmount || '0', formattedSwapData?.tokenB.decimals);
-
-		// let 6 decimals
-		_amount = _amount.slice(0, _amount.indexOf('.') + 7);
-
-		// remove trailing zeros
-		return _amount.replace(/\.?0+$/, '');
-	}, [toTokenAmount, formattedSwapData?.tokenB.decimals]);
 
 	useEffect(() => {
 		if (!isValidNetwork || !slippage || !amount) return;
 
 		try {
 			const tokensForUserNetwork = tokens.find(({ network }) => `${network}` === `${networkId}`);
-
-			console.log('tokensForUserNetwork', tokensForUserNetwork);
 
 			if (!tokensForUserNetwork) {
 				const supprotedNetworks = Object.keys(ENetwork)
@@ -95,8 +86,6 @@ const SwapConfirmationModal: FC<ISwapConfirmationModal> = ({ isOpen = false, onC
 			const formattedMinimumReceived: string = ethers.utils
 				.parseUnits((amount * (1 - slippage / 100)).toString(), _tokenB.decimals)
 				.toString();
-
-			console.log('new amount', formattedAmount);
 
 			setFormattedSwapData({
 				tokenA: _tokenA,
@@ -164,20 +153,20 @@ const SwapConfirmationModal: FC<ISwapConfirmationModal> = ({ isOpen = false, onC
 						type={ETextType.p}
 						size={ESize.l}
 						align={ETextAlign.left}
-					>{`${amount} ${tokenASymbol} → ${formattedToAmount} ${tokenBSymbol}`}</Text>
+					>{`${amount} ${tokenASymbol} → ${readableToTokenAmount} ${tokenBSymbol}`}</Text>
 
 					<Flex width={'100%'} marginTop={ESize.m} direction={EFlex.columnReverse} mdDirection={EFlex.row} gap={'16px'}>
-						<Button
-							width={'100%'}
-							mdWidth={'50%'}
-							// onClick={() => setSwapData({})}
-						>
+						<Button width={'100%'} mdWidth={'50%'} onClick={onClose}>
 							Cancel
 						</Button>
 						<Button
 							width={'100%'}
 							mdWidth={'50%'}
-							onClick={formattedSwapData?.isReady ? () => fusionSwap(formattedSwapData) : undefined}
+							onClick={
+								formattedSwapData?.isReady
+									? () => fusionSwap({ ...formattedSwapData, amount: fromTokenAmount || formattedSwapData.amount })
+									: undefined
+							}
 							disabled={!formattedSwapData?.isReady}
 							gradientContainerProps={{
 								background: formattedSwapData?.isReady ? theme.colors.success : theme.colors.success + '20'
