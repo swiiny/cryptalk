@@ -32,6 +32,7 @@ export interface Fields {
 	amount: any;
 	tokenA: any;
 	tokenB: any;
+	network: any;
 }
 export interface Intent {
 	inputContextNames?: null[] | null;

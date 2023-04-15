@@ -9,10 +9,6 @@ export const StyledChatFeed = styled.ul`
 
 	overflow-y: auto;
 
-	display: flex;
-	flex-direction: column;
-	justify-content: flex-end;
-
 	padding: 0;
 
 	& .is-left {

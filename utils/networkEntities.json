@@ -1,0 +1,82 @@
+[
+    {
+        "value": "ethereum",
+        "synonyms": [
+            "ethereum",
+            "network id 1",
+            "chain id1"
+        ]
+    },
+    {
+        "value": "binance",
+        "synonyms": [
+            "binance",
+            "network id 56",
+            "chain id56"
+        ]
+    },
+    {
+        "value": "polygon",
+        "synonyms": [
+            "polygon",
+            "network id 137",
+            "chain id137"
+        ]
+    },
+    {
+        "value": "optimism",
+        "synonyms": [
+            "optimism",
+            "network id 10",
+            "chain id10"
+        ]
+    },
+    {
+        "value": "arbitrum",
+        "synonyms": [
+            "arbitrum",
+            "network id 42161",
+            "chain id42161"
+        ]
+    },
+    {
+        "value": "gnosis",
+        "synonyms": [
+            "gnosis",
+            "network id 100",
+            "chain id100"
+        ]
+    },
+    {
+        "value": "avalanche",
+        "synonyms": [
+            "avalanche",
+            "network id 43114",
+            "chain id43114"
+        ]
+    },
+    {
+        "value": "fantom",
+        "synonyms": [
+            "fantom",
+            "network id 250",
+            "chain id250"
+        ]
+    },
+    {
+        "value": "klaytn",
+        "synonyms": [
+            "klaytn",
+            "network id 8217",
+            "chain id8217"
+        ]
+    },
+    {
+        "value": "aurora",
+        "synonyms": [
+            "aurora",
+            "network id 1313161554",
+            "chain id1313161554"
+        ]
+    }
+]

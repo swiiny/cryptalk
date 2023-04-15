@@ -46,8 +46,6 @@ const SwapConfirmationModal: FC<ISwapConfirmationModal> = ({ isOpen = false, onC
 		networkId
 	);
 
-	console.log('swapQuote', isLoading, fromTokenAmount, toTokenAmount);
-
 	const uuid = useId();
 
 	const formattedToAmount = useMemo(() => {

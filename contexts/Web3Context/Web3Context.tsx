@@ -289,7 +289,12 @@ const Web3Provider: FC<{ children: ReactNode }> = ({ children }) => {
 			} else {
 				// remove last 4 chars from ens
 				const formattedEns = ens?.replace(/.{4}$/, '');
-				pushMessage(EUser.bot, `Hey ${formattedEns || ''} 👋`);
+				pushMessage(
+					EUser.bot,
+					`Hey ${
+						formattedEns || ''
+					} 👋\nI'm here to help you with your crypto needs 🚀\n\nYou can ask me about:\n- Swap tokens\n- List of tokens to swap`
+				);
 			}
 		}, 2000);
 

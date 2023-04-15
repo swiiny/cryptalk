@@ -1,11 +1,13 @@
 import { SwapConfirmationModal } from '@components/modals/SwapConfirmationModal/SwapConfirmationModal';
 import { Button } from '@components/shared/Button/Button';
+import { ENetwork } from '@contexts/SwapContext/SwapContext.enum';
 import { useDialogFlowMutation } from '@hooks/chat/useDialogFlowMutation/useDialogFlowMutation';
 import { pushNewMessage } from '@hooks/chat/useMessagesQuery/useMessagesQuery';
 import { IMessage } from '@hooks/chat/useMessagesQuery/useMessagesQuery.type';
 import { useWeb3 } from '@hooks/useWeb3/useWeb3';
 import { useQueryClient } from '@tanstack/react-query';
-import { FC, FormEvent, useState } from 'react';
+import { tokens } from '@utils/tokens';
+import { FC, FormEvent, useEffect, useState } from 'react';
 import { useTheme } from 'styled-components';
 import { v4 as uuidv4 } from 'uuid';
 import { StyledChatInput } from './ChatInput.styles';
@@ -21,16 +23,16 @@ const ChatInput: FC<IChatInput> = () => {
 	const theme = useTheme();
 	const [message, setMessage] = useState('');
 	const { address, setIsWalletModalOpen } = useWeb3();
-	//const [swapData, setSwapData] = useState<TSwapData>({});
-	const [swapData, setSwapData] = useState<TSwapData>({
+	const [swapData, setSwapData] = useState<TSwapData>({});
+	/* const [swapData, setSwapData] = useState<TSwapData>({
 		tokenA: 'USDC',
 		tokenB: 'ETH',
 		amount: 1000,
 		slippage: 3,
 		isReadyToSwap: true
-	});
-	//const [isConfirmationModalOpen, setConfirmationModalOpen] = useState(false);
-	const [isConfirmationModalOpen, setConfirmationModalOpen] = useState(true);
+	}); */
+	const [isConfirmationModalOpen, setConfirmationModalOpen] = useState(false);
+	//const [isConfirmationModalOpen, setConfirmationModalOpen] = useState(true);
 
 	//const openAIMutation = useOpenAIMutation();
 	//const [inputType, setInputType] = useState<EInputType>(EInputType.selectAction);
@@ -55,6 +57,7 @@ const ChatInput: FC<IChatInput> = () => {
 		TokenB = 'TokenB',
 		SpecifyTokens = 'SpecifyTokens',
 		AvailableTokens = 'AvailableTokens',
+		SpecifyNetwork = 'SpecifyNetwork',
 		SpecifyTokenAAmountAndTokenB = 'SpecifyTokenAAmountAndTokenB'
 	}
 
@@ -129,7 +132,38 @@ const ChatInput: FC<IChatInput> = () => {
 							break;
 						case EIndent.AvailableTokens:
 							console.log('user wants to see available tokens');
-							// show tokenlist
+						case EIndent.SpecifyNetwork:
+							const networkKey = parameters?.network?.stringValue;
+
+							console.log('networkKey', networkKey);
+
+							if (!networkKey) {
+								pushMessage(EUser.bot, "Sorry, I can't find this network.");
+								return;
+							}
+
+							const matchingNetwork = ENetwork[networkKey as keyof typeof ENetwork];
+
+							if (!matchingNetwork) {
+								pushMessage(EUser.bot, "Sorry, I can't find this network.");
+								return;
+							}
+
+							const tokensForNetwork =
+								tokens.find((token) => token.network === matchingNetwork)?.tokens?.map(({ symbol }) => symbol) || [];
+
+							if (tokensForNetwork.length === 0) {
+								pushMessage(EUser.bot, "Sorry, I can't find any tokens for this network.");
+								return;
+							}
+
+							pushMessage(
+								EUser.bot,
+								answer
+									.replaceAll('[network]', networkKey)
+									.replaceAll('[availableTokens]', '\n- ' + tokensForNetwork.join('\n- ') + '\n\n')
+							);
+
 							break;
 						case EIndent.SpecifyTokenAAmountAndTokenB:
 							console.log('user wants to specify token A amount and token B');
@@ -148,6 +182,9 @@ const ChatInput: FC<IChatInput> = () => {
 									.replaceAll('[amount]', parameters.amount.numberValue.toString())
 							);
 						default:
+							if (answer) {
+								pushMessage(EUser.bot, answer);
+							}
 							break;
 					}
 				}
@@ -157,8 +194,8 @@ const ChatInput: FC<IChatInput> = () => {
 		setMessage('');
 	};
 
-	/* 	useEffect(() => {
-		function formatTokensToEntity() {
+	useEffect(() => {
+		/* 	function formatTokensToEntity() {
 			const newEntities = tokens.flatMap((token) => {
 				return token.tokens.map((_token) => {
 					return {
@@ -176,10 +213,17 @@ const ChatInput: FC<IChatInput> = () => {
 			console.log(uniqueEntities);
 			console.log(uniqueEntities.length);
 			console.log(newEntities.length);
-		}
+		} 
 
-		formatTokensToEntity();
-	}, []); */
+		// can you do the same format for ENetworks?
+	const networks = Object.entries(ENetwork).map(([key, value]) => {
+			return {
+				value: key,
+				synonyms: [key, 'network id ' + value, 'chain id ' + value]
+			};
+		}); 
+		*/
+	}, []);
 
 	return (
 		<>
