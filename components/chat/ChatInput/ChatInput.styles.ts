@@ -30,9 +30,9 @@ export const StyledChatInput = styled.div(
 
 				border: none;
 
-				font-size: 1.2rem;
+				font-size: 1rem;
 
-				${mq(EMediaQuery.md, 'font-size: 1rem;')}
+				${mq(EMediaQuery.md, 'font-size: 1.2rem;')}
 
 				padding: 12px 0px;
 

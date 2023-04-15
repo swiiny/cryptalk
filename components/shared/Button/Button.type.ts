@@ -14,6 +14,7 @@ interface IButton extends IFrames, IHiddenRanges, IPadding, IMargin {
 	iconColor?: string;
 	gradientContainerProps?: IGradientContainer;
 	type?: 'button' | 'submit' | 'reset';
+	disabled?: boolean;
 }
 
 interface ISharedButtonProps {

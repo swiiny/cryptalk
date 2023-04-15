@@ -1,3 +1,4 @@
+import { TSwapData } from '@components/chat/ChatInput/ChatInput.type';
 import { IWallet } from '@interfaces/wallet';
 import Address from '@models/Address';
 import WalletConnectProvider from '@walletconnect/web3-provider';
@@ -16,6 +17,7 @@ interface IWeb3 {
 	connectWallet: (wallet: IWallet) => void;
 	setIsWalletModalOpen: (newState: boolean) => void;
 	disconnectWallet: () => void;
+	fusionSwap: (swapData: TSwapData) => Promise<void>;
 }
 
 interface IWeb3Provider {

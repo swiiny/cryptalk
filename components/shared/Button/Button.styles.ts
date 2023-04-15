@@ -20,6 +20,12 @@ const sharedStyle = (p: ISharedButtonProps) => {
 
 		cursor: pointer;
 
+		&:disabled {
+			cursor: default;
+			pointer-events: none;
+			user-select: none;
+		}
+
 		font-size: calc(1.5rem * 0.6);
 
 		${mq(EMediaQuery.sm, `font-size: calc(1.5rem * 0.7);`)}
@@ -74,11 +80,6 @@ export const StyledButton = styled.button<ISharedButtonProps>`
 		${addMarginStyles(p)}
 		${addFramesStyles(p)}
 	`}
-
-	& + button,
-	& + a {
-		margin-left: 16px;
-	}
 `;
 
 export const StyledLink = styled.a<ISharedButtonProps>`

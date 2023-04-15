@@ -1,8 +1,11 @@
 import { EUser } from '@components/chat/ChatInput/ChatInput';
+import { TSwapData } from '@components/chat/ChatInput/ChatInput.type';
+import { ENetwork } from '@contexts/SwapContext/SwapContext.enum';
 import { pushNewMessage } from '@hooks/chat/useMessagesQuery/useMessagesQuery';
 import { IMessage } from '@hooks/chat/useMessagesQuery/useMessagesQuery.type';
 import Address from '@models/Address';
 import { useQueryClient } from '@tanstack/react-query';
+import { tokens } from '@utils/tokens';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import { ethers, providers } from 'ethers';
 import { IWallet } from 'interfaces/wallet';
@@ -47,9 +50,6 @@ const Web3Provider: FC<{ children: ReactNode }> = ({ children }) => {
 				try {
 					provider.on('chainChanged', (chainId: number): void => {
 						getNetworkId(chainId);
-
-						// reload page
-						window.location.reload();
 					});
 
 					provider.on('accountsChanged', async (accounts: string[]) => {
@@ -200,6 +200,45 @@ const Web3Provider: FC<{ children: ReactNode }> = ({ children }) => {
 		[networkId]
 	);
 
+	const fusionSwap = useCallback(
+		async ({ tokenA: tokenASymbol, tokenB: tokenBSymbol, amount, slippage }: TSwapData) => {
+			try {
+				const tokensForUserNetwork = tokens.find(({ network }) => `${network}` === `${networkId}`);
+
+				if (!tokensForUserNetwork) {
+					const supprotedNetworks = Object.keys(ENetwork)
+						.map((key) => {
+							// capitalize first letter
+							return '- ' + key.charAt(0).toUpperCase() + key.slice(1);
+						})
+						.join('\n');
+
+					const newMessage: IMessage = {
+						id: uuidv4(),
+						user: EUser.bot,
+						value: `Please connect your wallet to one of the supported networks\n${supprotedNetworks}`,
+						timestamp: Date.now()
+					};
+
+					pushNewMessage(newMessage, queryClient);
+					return;
+				}
+
+				const _tokenA = tokensForUserNetwork?.tokens.find(
+					({ symbol }) => symbol.toLowerCase() === tokenASymbol?.toLowerCase()
+				);
+				const _tokenB = tokensForUserNetwork?.tokens.find(
+					({ symbol }) => symbol.toLowerCase() === tokenBSymbol?.toLowerCase()
+				);
+
+				console.log('tokens to swap', _tokenA, _tokenB);
+			} catch (err) {
+				console.error('buildTx', err);
+			}
+		},
+		[networkId, queryClient]
+	);
+
 	useEffect(() => {
 		setIsValidNetwork(checkIfNetworkIsValid(networkId || 0));
 	}, [networkId]);
@@ -241,14 +280,16 @@ const Web3Provider: FC<{ children: ReactNode }> = ({ children }) => {
 		// wait 3 seconds, if there is no address then send message to connect wallet
 		const timeout = setTimeout(() => {
 			if (!address) {
-				pushMessage(EUser.bot, 'Hey! Please connect your wallet to interact with me 🦊');
+				pushMessage(EUser.bot, 'Please connect your wallet to interact with me 🦊');
 			} else {
-				pushMessage(EUser.bot, 'Hey! Welcome back 🦊');
+				// remove last 4 chars from ens
+				const formattedEns = ens?.replace(/.{4}$/, '');
+				pushMessage(EUser.bot, `Hey ${formattedEns || ''} 👋`);
 			}
-		}, 3000);
+		}, 2000);
 
 		return () => clearTimeout(timeout);
-	}, [address, queryClient]);
+	}, [address, queryClient, ens]);
 
 	useEffect(() => {
 		getNetworkId();
@@ -268,7 +309,8 @@ const Web3Provider: FC<{ children: ReactNode }> = ({ children }) => {
 				isConnectingWallet,
 				isValidNetwork,
 				isWalletModalOpen,
-				setIsWalletModalOpen
+				setIsWalletModalOpen,
+				fusionSwap
 			}}
 		>
 			{children}
