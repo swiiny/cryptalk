@@ -158,7 +158,6 @@ const ChatInput: FC<IChatInput> = () => {
 					})
 					.join('\n');
 
-				console.log('supprotedNetworks', supprotedNetworks);
 				// network not found
 				pushMessage(EUser.bot, `Please connect your wallet to one of the supported networks\n${supprotedNetworks}`);
 				//throw new Error('Network not found');
@@ -206,19 +205,6 @@ const ChatInput: FC<IChatInput> = () => {
 		<StyledChatInput>
 			{swapData.isReadyToSwap ? (
 				<>
-					{/* 
-					<Button
-						onClick={() =>
-							buildTx({
-								tokenA: 'USDC',
-								tokenB: 'DAI',
-								amount: 100,
-								slippage: 1
-							})
-						}
-					>
-						Test network
-					</Button> */}
 					<Button onClick={() => buildTx(swapData)}>
 						Swap {swapData.amount} {swapData.tokenA} for {swapData.tokenB}
 					</Button>

@@ -4,10 +4,7 @@ const projectId = process.env.DIALOGFLOW_PROJECT_ID || '';
 //const sessionId = 'unique-session-id'; // You can generate a unique ID for each user session
 const languageCode = 'en-US';
 
-// import credentials from '../../private/appogee-dev-api-10fa1401f35c.json';
-import credentials from '../../private/cryptalk-383723-3589ec633636.json';
-
-//const sessionClient = new dialogflow.SessionsClient();
+const credentials = JSON.parse(process.env.GCP_CREDENTIALS || '{}');
 
 async function sendMessageToDialogflow(text: string, sessionId: string) {
 	if (!projectId) {
@@ -38,11 +35,12 @@ async function sendMessageToDialogflow(text: string, sessionId: string) {
 	return result;
 }
 
-export default async function handler(req, res) {
+export default async function handler(req: any, res: any) {
 	if (req.method === 'POST') {
 		const { message, sessionId } = req.body;
 		try {
 			const response = await sendMessageToDialogflow(message, sessionId);
+
 			res.status(200).json(response);
 		} catch (error) {
 			console.error('Dialogflow error:', error);

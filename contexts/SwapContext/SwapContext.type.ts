@@ -1,4 +1,4 @@
-import { ENetwork } from './SwapContext.functions';
+import { ENetwork } from './SwapContext.enum';
 
 interface IToken {
 	symbol: string;

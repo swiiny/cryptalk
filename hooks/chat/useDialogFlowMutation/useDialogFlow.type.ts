@@ -27,7 +27,12 @@ export interface Text {
 export interface Parameters {
 	fields: Fields;
 }
-export interface Fields {}
+export interface Fields {
+	slippage: any;
+	amount: any;
+	tokenA: any;
+	tokenB: any;
+}
 export interface Intent {
 	inputContextNames?: null[] | null;
 	events?: null[] | null;
