@@ -22,6 +22,13 @@ const WalletLocalStorageKey = 'wallet';
 
 export const Web3Context = createContext<IWeb3 | undefined>(undefined);
 
+const mmOptions = {
+	useDeeplink: false,
+	enableDebug: true,
+	rpc: 'https://mainnet.infura.io/v3/',
+	infuraId: process.env.INFURA_API_KEY
+};
+
 const defaultProvider = { error: true };
 const Web3Provider: FC<{ children: ReactNode }> = ({ children }) => {
 	const [provider, setProvider] = useState<IWeb3Provider>({ error: true });
@@ -49,9 +56,7 @@ const Web3Provider: FC<{ children: ReactNode }> = ({ children }) => {
 		(provider: any) => {
 			if (provider) {
 				try {
-					console.log('registering');
 					provider.on('chainChanged', (chainId: number): void => {
-						console.log('chainchanged');
 						getNetworkId(chainId);
 					});
 
@@ -88,18 +93,19 @@ const Web3Provider: FC<{ children: ReactNode }> = ({ children }) => {
 
 				switch (wallet.name) {
 					case WALLETS.metamask.name:
-						const MMSDK = new MetaMaskSDK();
+						const MMSDK = new MetaMaskSDK(mmOptions);
+
 						const ethereum = MMSDK.getProvider();
+
+						const web3provider = new providers.Web3Provider(ethereum);
 
 						const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
 
 						setAddress(Address.from(accounts[0]));
 
-						//const web3provider = new providers.Web3Provider(web3Instance);
-
 						setProvider({
-							web3Provider: ethereum,
-							web3Instance: MMSDK
+							web3Provider: web3provider,
+							web3Instance: window.ethereum
 						});
 
 						initWeb3Listeners(ethereum);
@@ -148,14 +154,15 @@ const Web3Provider: FC<{ children: ReactNode }> = ({ children }) => {
 
 	const getNetworkId = async (chainId?: number) => {
 		try {
-			const MMSDK = new MetaMaskSDK();
-			const provider = MMSDK.getProvider();
+			let networkId = chainId;
 
-			const networkId = chainId || (await provider?.request({ method: 'eth_chainId' })) || undefined;
+			if (!networkId) {
+				networkId = await window.ethereum?.request({ method: 'eth_chainId' });
+			}
 
 			if (networkId) {
-				if (`${networkId}`.startsWith('0x')) {
-					const intNetworkId = parseInt(networkId, 16);
+				if (`${chainId}`.startsWith('0x')) {
+					const intNetworkId = parseInt(`${networkId}`, 16);
 
 					setNetworkId(intNetworkId);
 					return;
@@ -191,14 +198,13 @@ const Web3Provider: FC<{ children: ReactNode }> = ({ children }) => {
 	const checkIfUserHasEns = useCallback(async (address: Address) => {
 		if (address) {
 			try {
-				const MMSDK = new MetaMaskSDK();
-
 				// get provider from ethers to have the lookupAddress method
-				const provider = new ethers.providers.Web3Provider(MMSDK.getProvider());
+				const provider = new ethers.providers.JsonRpcProvider(
+					'https://mainnet.infura.io/v3/' + process.env.INFURA_API_KEY,
+					1
+				);
 
 				const resolver = await provider?.lookupAddress(address.toString());
-
-				console.log('resolver', resolver);
 
 				if (resolver) {
 					setEns(resolver);
@@ -257,10 +263,10 @@ const Web3Provider: FC<{ children: ReactNode }> = ({ children }) => {
 	}, [checkIfWalletIsConnected]);
 
 	useEffect(() => {
-		if (address && provider?.web3Provider) {
-			checkIfUserHasEns(address, provider.web3Provider);
+		if (address) {
+			checkIfUserHasEns(address);
 		}
-	}, [address, checkIfUserHasEns, provider?.web3Provider]);
+	}, [address, checkIfUserHasEns]);
 
 	useEffect(() => {
 		console.debug('address', address?.toString());
@@ -308,12 +314,12 @@ const Web3Provider: FC<{ children: ReactNode }> = ({ children }) => {
 		return () => clearTimeout(timeout);
 	}, [address, queryClient, ens]);
 
-	/* 	useEffect(() => {
+	useEffect(() => {
 		if (address) {
 			getNetworkId();
 		}
 	}, [address]);
- */
+
 	return (
 		<Web3Context.Provider
 			value={{
