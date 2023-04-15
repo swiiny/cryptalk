@@ -375,8 +375,66 @@ function createFusionOrder(input, maker: string) {
 			);
 		}
 
-		_getEnsAndSayHello();
-	}, [address, checkIfUserHasEns, , queryClient, isValidNetwork]);
+		const timeout = setTimeout(() => {
+			_getEnsAndSayHello();
+		}, 600);
+
+		return () => clearTimeout(timeout);
+	}, [address, checkIfUserHasEns, queryClient, isValidNetwork]);
+
+	//const swapAggregator = useCallback(async ({ allowanceCalldata, amount }) => {
+
+	const approveSpender = useCallback(
+		async (calldata: { data: string; gasPrice: string; to: string; value: string }) => {
+			try {
+				console.log({ calldata, address });
+				if (!address) {
+					throw new Error('No address found');
+				}
+
+				const signer = provider?.web3Provider?.getSigner();
+
+				const tx = await signer?.sendTransaction({
+					...calldata,
+					from: address?.toString()
+				});
+
+				tx?.wait();
+			} catch (err) {
+				console.error('approvaSpender', err);
+			}
+		},
+		[address, provider?.web3Provider]
+	);
+
+	const swapAggregator = useCallback(
+		async (swapTx: any): Promise<string> => {
+			try {
+				const signer = provider?.web3Provider?.getSigner();
+
+				const gp = await provider?.web3Provider?.getGasPrice();
+				const tgp = gp?.div(10);
+				const gasPrice = gp?.add(tgp?.mul(4) || 0);
+
+				const tx = await signer?.sendTransaction({
+					from: swapTx.from,
+					to: swapTx.to,
+					gasPrice: gasPrice,
+					gasLimit: 650000,
+					value: swapTx.value,
+					data: swapTx.data
+				});
+
+				await tx?.wait();
+
+				return tx?.hash || '';
+			} catch (err) {
+				console.error('swapAggregator', err);
+				return '';
+			}
+		},
+		[provider?.web3Provider]
+	);
 
 	useEffect(() => {
 		if (address) {
@@ -401,7 +459,9 @@ function createFusionOrder(input, maker: string) {
 				ens,
 				isConnectingWallet,
 				isValidNetwork,
-				fusionSwap
+				fusionSwap,
+				approveSpender,
+				swapAggregator
 			}}
 		>
 			{children}

@@ -28,20 +28,20 @@ const ChatInput: FC<IChatInput> = () => {
 	const [isConfirmationModalOpen, setConfirmationModalOpen] = useState(false);
 	const { mutate: mutateDialogFlow } = useDialogFlowMutation();
 
-	/* 	useEffect(() => {
+	/* useEffect(() => {
 		if (address) {
 			setSwapData({
 				tokenA: 'WMATIC',
 				tokenB: 'USDC',
-				amount: 1,
-				slippage: 3,
+				amount: 0.1,
+				slippage: 2,
 				isReadyToSwap: true
 			});
 
 			setConfirmationModalOpen(true);
 		}
-	}, [address]);
- */
+	}, [address]); */
+
 	function pushMessage(user: EUser, message: string) {
 		const newMessage: IMessage = {
 			id: uuidv4(),

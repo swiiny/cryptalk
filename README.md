@@ -1,33 +1,12 @@
 # Cryptalk
 
+Cryptalk is an innovative and user-centric platform that simplifies the process of cryptocurrency swaps through the power of natural language processing. By leveraging the Dialogflow platform, Cryptalk creates an intuitive and engaging conversational interface that effectively extracts swap-related information from users, streamlining the swap process and ensuring a seamless experience.
+
 ## Features
 
-- [] use openAI models to interact with users to extract swap information 🚮
-- [] use openAI models to interact with users to extract swap information 🚮
-- [x] use Dialogflow to interact with users to extract swap information
-- [] use 1Inch fusion API to swap tokens 🤌
-- [x] use metamask SDK to interact with wallet
-- [] use Airstack to fetch balances on Ethereum network
-- [] use RPC to fetch balances on other networks
-
-### Bot features
-
-- [x] get swap informations
-- [x] show token user can swap (fetch user wallet balances) and told
-- [] check has enough gas to swap
-  - [] if not then tell the user to add gas (probably not a problem with fusion)
-- [] check has enough token to swap
-  - [] if not then they don't have enough token to swap and inform the user
-
-## TODO
-
-- [x] conversation UI
-  - [x] user input
-  - [x] chat box with bot
-  - [x] buttons + input
-- [] swap logic using 1inch fusion SDK (didn't manage to make it work)
-- [x] define decision tree for bot
-  - [x] what the user want to do
-    - [x] if a swap then ask for the token to swap from
-    - [x] if a swap then ask for the token to swap to
-    - [x] if a swap then ask for the amount to swap
+- AI-driven conversational interface using [Dialogflow](https://dialogflow.cloud.google.com/)
+- Supports multiple networks such as Ethereum, Polygon, and Binance Smart Chain
+- Intuitive user interaction for a seamless swapping experience
+- Efficient and user-friendly execution of swaps
+- Comprehensive hooks and API integrations with [1inch](https://1inch.io/)
+- Integration of [MetaMaskSDK](https://metamask.io/sdk/) for wallet management

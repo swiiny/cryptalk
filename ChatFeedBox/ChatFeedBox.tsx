@@ -42,9 +42,11 @@ const ChatFeedBox: FC<IChatFeedBox> = ({ id, user, value, timestamp }) => {
 				marginLeft={!isUser ? undefined : 'auto'}
 				marginRight={isUser ? undefined : 'auto'}
 				width='fit-content'
+				maxWidth={'100%'}
 				background={isUser ? theme.colors.darkGradient : theme.colors.blueGradient}
 			>
-				<Text type={ETextType.p} size={ESize.l}>
+				{/* @ts-ignore */}
+				<Text type={ETextType.p} size={ESize.l} style={{ lineBreak: 'anywhere' }}>
 					{formattedValue()}
 				</Text>
 			</GradientContainer>

@@ -15,6 +15,8 @@ interface IWeb3 {
 	connectWallet: (wallet: IWallet) => void;
 	disconnectWallet: () => void;
 	fusionSwap: (swapData: IFormattedSwapData) => Promise<void>;
+	approveSpender: (...args: any) => Promise<void>;
+	swapAggregator: (...args: any) => Promise<string>;
 }
 
 interface IWeb3Provider {

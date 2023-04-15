@@ -1,3 +1,4 @@
+import { ENetwork } from '@contexts/SwapContext/SwapContext.enum';
 import { INetwork } from '@interfaces/network';
 import { IWallet } from '@interfaces/wallet';
 
@@ -40,6 +41,12 @@ const NETWORKS_RPC: {
 	[NETWORKS_DATA.ethereum.networkId]: NETWORKS_DATA.ethereum.rpc,
 	[NETWORKS_DATA.bsc.networkId]: NETWORKS_DATA.bsc.rpc,
 	[NETWORKS_DATA.polygon.networkId]: NETWORKS_DATA.polygon.rpc
+};
+
+export const NETWORK_EXPLORER = {
+	[ENetwork.ethereum]: 'https://etherscan.io/tx/',
+	[ENetwork.binance]: 'https://bscscan.com/tx/',
+	[ENetwork.polygon]: 'https://polygonscan.com/tx/'
 };
 
 const VALID_CHAIN_IDS: number[] = (Object.values(NETWORKS_DATA) as INetwork[])
