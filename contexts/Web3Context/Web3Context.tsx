@@ -3,6 +3,7 @@ import { TSwapData } from '@components/chat/ChatInput/ChatInput.type';
 import { ENetwork } from '@contexts/SwapContext/SwapContext.enum';
 import { pushNewMessage } from '@hooks/chat/useMessagesQuery/useMessagesQuery';
 import { IMessage } from '@hooks/chat/useMessagesQuery/useMessagesQuery.type';
+import MetaMaskSDK from '@metamask/sdk';
 import Address from '@models/Address';
 import { useQueryClient } from '@tanstack/react-query';
 import { tokens } from '@utils/tokens';
@@ -85,17 +86,21 @@ const Web3Provider: FC<{ children: ReactNode }> = ({ children }) => {
 
 				switch (wallet.name) {
 					case WALLETS.metamask.name:
-						const web3Instance = window.ethereum;
+						//const web3Instance = window.ethereum;
 
-						const accounts = await web3Instance.request({ method: 'eth_requestAccounts' });
+						const MMSDK = new MetaMaskSDK();
+
+						const ethereum = MMSDK.getProvider();
+
+						const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
 
 						setAddress(Address.from(accounts[0]));
 
-						const web3provider = new providers.Web3Provider(web3Instance);
+						//const web3provider = new providers.Web3Provider(web3Instance);
 
 						setProvider({
-							web3Provider: web3provider,
-							web3Instance: web3Instance
+							web3Provider: ethereum,
+							web3Instance: MMSDK
 						});
 
 						initWeb3Listeners(window.ethereum);
