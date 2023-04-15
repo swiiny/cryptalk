@@ -11,7 +11,7 @@
 ### Bot features
 
 - [] get swap informations
-- [] show token user can swap (fetch user wallet balances) and told
+- [x] show token user can swap (fetch user wallet balances) and told
 - [] check has enough gas to swap
   - [] if not then tell the user to add gas (probably not a problem with fusion)
 - [] check has enough token to swap

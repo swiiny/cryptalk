@@ -49,7 +49,9 @@ const Web3Provider: FC<{ children: ReactNode }> = ({ children }) => {
 		(provider: any) => {
 			if (provider) {
 				try {
+					console.log('registering');
 					provider.on('chainChanged', (chainId: number): void => {
+						console.log('chainchanged');
 						getNetworkId(chainId);
 					});
 
@@ -86,10 +88,7 @@ const Web3Provider: FC<{ children: ReactNode }> = ({ children }) => {
 
 				switch (wallet.name) {
 					case WALLETS.metamask.name:
-						//const web3Instance = window.ethereum;
-
 						const MMSDK = new MetaMaskSDK();
-
 						const ethereum = MMSDK.getProvider();
 
 						const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
@@ -103,7 +102,7 @@ const Web3Provider: FC<{ children: ReactNode }> = ({ children }) => {
 							web3Instance: MMSDK
 						});
 
-						initWeb3Listeners(window.ethereum);
+						initWeb3Listeners(ethereum);
 
 						break;
 					case WALLETS.walletConnect.name:
@@ -148,20 +147,27 @@ const Web3Provider: FC<{ children: ReactNode }> = ({ children }) => {
 	);
 
 	const getNetworkId = async (chainId?: number) => {
-		const networkId = chainId || (await window?.ethereum?.request({ method: 'eth_chainId' })) || undefined;
+		try {
+			const MMSDK = new MetaMaskSDK();
+			const provider = MMSDK.getProvider();
 
-		if (networkId) {
-			if (`${networkId}`.startsWith('0x')) {
-				const intNetworkId = parseInt(networkId, 16);
+			const networkId = chainId || (await provider?.request({ method: 'eth_chainId' })) || undefined;
 
-				setNetworkId(intNetworkId);
-				return;
+			if (networkId) {
+				if (`${networkId}`.startsWith('0x')) {
+					const intNetworkId = parseInt(networkId, 16);
+
+					setNetworkId(intNetworkId);
+					return;
+				}
+
+				setNetworkId(networkId);
+			} else {
+				console.error("can't get chain id");
+				setNetworkId(undefined);
 			}
-
-			setNetworkId(networkId);
-		} else {
-			console.error("can't get chain id");
-			setNetworkId(undefined);
+		} catch (err) {
+			console.error('Error while getting network id', err);
 		}
 	};
 
@@ -182,28 +188,26 @@ const Web3Provider: FC<{ children: ReactNode }> = ({ children }) => {
 		return 0;
 	}, [connectWallet]);
 
-	const checkIfUserHasEns = useCallback(
-		async (address: Address, web3Provider: ethers.providers.Web3Provider) => {
-			if (address && networkId) {
-				let ethereumProvider;
+	const checkIfUserHasEns = useCallback(async (address: Address) => {
+		if (address) {
+			try {
+				const MMSDK = new MetaMaskSDK();
 
-				if (networkId === 1) {
-					ethereumProvider = web3Provider;
-				} else {
-					ethereumProvider = new ethers.providers.JsonRpcProvider(
-						process.env.RPC_ETHEREUM || 'https://rpc.ankr.com/eth'
-					);
-				}
+				// get provider from ethers to have the lookupAddress method
+				const provider = new ethers.providers.Web3Provider(MMSDK.getProvider());
 
-				const resolver = await ethereumProvider?.lookupAddress(address.toString());
+				const resolver = await provider?.lookupAddress(address.toString());
+
+				console.log('resolver', resolver);
 
 				if (resolver) {
 					setEns(resolver);
 				}
+			} catch (err) {
+				console.error('Error while getting ENS', err);
 			}
-		},
-		[networkId]
-	);
+		}
+	}, []);
 
 	const fusionSwap = useCallback(
 		async ({ tokenA: tokenASymbol, tokenB: tokenBSymbol, amount, slippage }: TSwapData) => {
@@ -304,10 +308,12 @@ const Web3Provider: FC<{ children: ReactNode }> = ({ children }) => {
 		return () => clearTimeout(timeout);
 	}, [address, queryClient, ens]);
 
-	useEffect(() => {
-		getNetworkId();
-	}, []);
-
+	/* 	useEffect(() => {
+		if (address) {
+			getNetworkId();
+		}
+	}, [address]);
+ */
 	return (
 		<Web3Context.Provider
 			value={{
