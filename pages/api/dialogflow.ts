@@ -44,7 +44,7 @@ export default async function handler(req: any, res: any) {
 			res.status(200).json(response);
 		} catch (error) {
 			console.error('Dialogflow error:', error);
-			res.status(500).json({ error: 'Internal server error' });
+			res.status(500).json({ error: 'Internal server error:' + error });
 		}
 	} else {
 		res.status(405).json({ error: 'Method not allowed' });
