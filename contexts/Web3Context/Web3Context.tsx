@@ -42,6 +42,7 @@ async function wrapNativeToken(wrapTokenAddress: string, amount: string, provide
 let MMSDK: MetaMaskSDK;
 
 const defaultProvider = { error: true };
+
 const Web3Provider: FC<{ children: ReactNode }> = ({ children }) => {
 	const [provider, setProvider] = useState<IWeb3Provider>({ error: true });
 	const [address, setAddress] = useState<Address | undefined>(undefined);
@@ -356,6 +357,14 @@ function createFusionOrder(input, maker: string) {
 		async function _getEnsAndSayHello() {
 			const _ens = await checkIfUserHasEns(address!);
 
+			if (!isValidNetwork) {
+				pushMessage(
+					EUser.bot,
+					"I noticed you're currently on an unknown network. 😕\nTo assist you better, please switch to one of the supported networks below! 🚀\n\n- Ethereum\n- Polygon\n- Binance Smart Chain"
+				);
+
+				return;
+			}
 			// remove last 4 chars from ens
 			const formattedEns = _ens?.replace(/.{4}$/, '');
 			pushMessage(
@@ -367,7 +376,7 @@ function createFusionOrder(input, maker: string) {
 		}
 
 		_getEnsAndSayHello();
-	}, [address, checkIfUserHasEns, , queryClient]);
+	}, [address, checkIfUserHasEns, , queryClient, isValidNetwork]);
 
 	useEffect(() => {
 		if (address) {

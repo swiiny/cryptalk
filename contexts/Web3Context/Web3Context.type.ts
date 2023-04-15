@@ -1,7 +1,6 @@
 import { IFormattedSwapData } from '@components/modals/SwapConfirmationModal/SwapConfirmationModal';
 import { IWallet } from '@interfaces/wallet';
 import Address from '@models/Address';
-import WalletConnectProvider from '@walletconnect/web3-provider';
 import { providers } from 'ethers';
 
 interface IWeb3 {
@@ -20,7 +19,7 @@ interface IWeb3 {
 
 interface IWeb3Provider {
 	web3Provider?: providers.Web3Provider;
-	web3Instance?: WalletConnectProvider | any;
+	web3Instance?: any;
 	isWallet?: boolean;
 	error?: boolean;
 }
