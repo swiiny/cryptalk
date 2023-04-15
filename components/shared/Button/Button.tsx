@@ -17,6 +17,7 @@ const Button: FC<IButton> = ({
 	color,
 	icon,
 	iconColor,
+	type = 'button',
 	gradientContainerProps,
 	...otherProps
 }) => {

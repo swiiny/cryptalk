@@ -13,6 +13,7 @@ interface IButton extends IFrames, IHiddenRanges, IPadding, IMargin {
 	icon?: ReactNode;
 	iconColor?: string;
 	gradientContainerProps?: IGradientContainer;
+	type?: 'button' | 'submit' | 'reset';
 }
 
 interface ISharedButtonProps {

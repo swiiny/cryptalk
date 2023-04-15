@@ -1,3 +1,5 @@
+import { EMediaQuery } from '@theme/theme.enum';
+import { mq } from '@utils/functions';
 import styled, { css } from 'styled-components';
 
 export const StyledChatInput = styled.div(
@@ -6,22 +8,38 @@ export const StyledChatInput = styled.div(
 
 		width: 100%;
 
+		display: flex;
+		justify-content: center;
+		align-items: center;
+
 		& > form {
+			width: 100%;
+			height: 100%;
+			background-color: ${p.theme.colors.darkGray};
+
+			border-radius: ${p.theme.spacing['2xs']};
+			border: 1px solid ${p.theme.colors.gray}50;
+
+			padding: 6px 16px;
+
+			box-shadow: 0px 5px 20px 10px ${p.theme.colors.black + '50'};
+
 			& > input {
 				width: 80%;
-				background-color: ${p.theme.colors.darkGray};
+				background-color: transparent;
 
-				border-top-left-radius: ${p.theme.spacing['4xs']};
-				border-bottom-left-radius: ${p.theme.spacing['4xs']};
-				border: 1px solid ${p.theme.colors.gray}50;
+				border: none;
 
-				box-shadow: 0px 5px 20px 10px ${p.theme.colors.black + '50'};
+				font-size: 1.2rem;
 
-				font-size: 1rem;
+				${mq(EMediaQuery.md, 'font-size: 1rem;')}
 
-				padding: 4px 8px;
+				padding: 12px 0px;
 
 				cursor: text;
+
+				// deactivate focus outline
+				outline: none;
 
 				&::placeholder {
 					color: ${p.theme.colors.gray};
@@ -30,19 +48,6 @@ export const StyledChatInput = styled.div(
 
 			& > button {
 				width: 20%;
-				padding: 4px 8px;
-
-				border-top-right-radius: ${p.theme.spacing['4xs']};
-				border-bottom-right-radius: ${p.theme.spacing['4xs']};
-				border: 1px solid ${p.theme.colors.gray}50;
-
-				box-shadow: 0px 5px 20px 10px ${p.theme.colors.black + '50'};
-
-				background-color: gray;
-
-				font-size: 1rem;
-
-				cursor: pointer;
 			}
 		}
 	`

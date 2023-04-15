@@ -7,6 +7,7 @@ import { useWeb3 } from '@hooks/useWeb3/useWeb3';
 import { useQueryClient } from '@tanstack/react-query';
 import { tokens } from '@utils/tokens';
 import { FC, FormEvent, useState } from 'react';
+import { useTheme } from 'styled-components';
 import { v4 as uuidv4 } from 'uuid';
 import { StyledChatInput } from './ChatInput.styles';
 import { IChatInput } from './ChatInput.type';
@@ -19,13 +20,14 @@ type TCurrentUserInfo = {
 	isReadyToSwap?: boolean;
 };
 
-enum EUser {
+export enum EUser {
 	bot = 'GPT-3',
 	user = 'User'
 }
 
 const ChatInput: FC<IChatInput> = () => {
 	const queryClient = useQueryClient();
+	const theme = useTheme();
 	const [message, setMessage] = useState('');
 	const { address, networkId } = useWeb3();
 	const [swapData, setSwapData] = useState<TCurrentUserInfo>({});
@@ -220,11 +222,20 @@ const ChatInput: FC<IChatInput> = () => {
 					<input
 						id='chat-input'
 						type='text'
+						min={1}
+						max={50}
 						placeholder='I want to swap tokens...'
 						value={message}
 						onChange={(e) => setMessage(e.target.value)}
 					/>
-					<button type='submit'>Send</button>
+					<Button
+						type='submit'
+						gradientContainerProps={{
+							background: message.length > 1 ? theme.colors.success : theme.colors.darkGradient
+						}}
+					>
+						Send
+					</Button>
 				</form>
 			)}
 		</StyledChatInput>

@@ -36,15 +36,15 @@ const ChatFeedBox: FC<IChatFeedBox> = ({ id, user, value, timestamp }) => {
 	return (
 		<StyledChatFeedBox className={!isUser ? 'is-left' : 'is-right'}>
 			<GradientContainer
-				borderRadius={'6px'}
-				paddingY={4}
+				borderRadius={'8px'}
+				paddingY={6}
 				paddingX={12}
 				marginLeft={!isUser ? undefined : 'auto'}
 				marginRight={isUser ? undefined : 'auto'}
 				width='fit-content'
 				background={isUser ? theme.colors.darkGradient : theme.colors.blueGradient}
 			>
-				<Text type={ETextType.p} size={ESize.m}>
+				<Text type={ETextType.p} size={ESize.l}>
 					{formattedValue()}
 				</Text>
 			</GradientContainer>

@@ -1,9 +1,14 @@
+import { EUser } from '@components/chat/ChatInput/ChatInput';
+import { pushNewMessage } from '@hooks/chat/useMessagesQuery/useMessagesQuery';
+import { IMessage } from '@hooks/chat/useMessagesQuery/useMessagesQuery.type';
 import Address from '@models/Address';
+import { useQueryClient } from '@tanstack/react-query';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import { ethers, providers } from 'ethers';
 import { IWallet } from 'interfaces/wallet';
 import { FC, ReactNode, createContext, useCallback, useEffect, useState } from 'react';
 import { clearLocalStorage, getLocalStorage, setLocalStorage } from 'utils/global';
+import { v4 as uuidv4 } from 'uuid';
 import { checkIfNetworkIsValid, getWalletFromName } from './Web3Context.functions';
 import { IWeb3, IWeb3Provider } from './Web3Context.type';
 import { NETWORKS_RPC, WALLETS } from './Web3Context.variables';
@@ -24,6 +29,7 @@ const Web3Provider: FC<{ children: ReactNode }> = ({ children }) => {
 	const [isConnectingWallet, setIsConnectingWallet] = useState<boolean>(false);
 	const [isValidNetwork, setIsValidNetwork] = useState<boolean>(false);
 	const [ens, setEns] = useState<string | undefined>(undefined);
+	const queryClient = useQueryClient();
 
 	const disconnectWallet = useCallback(() => {
 		setProvider(defaultProvider);
@@ -219,6 +225,30 @@ const Web3Provider: FC<{ children: ReactNode }> = ({ children }) => {
 	useEffect(() => {
 		console.debug('isValidNetwork', isValidNetwork);
 	}, [isValidNetwork]);
+
+	useEffect(() => {
+		function pushMessage(user: EUser, message: string) {
+			const newMessage: IMessage = {
+				id: uuidv4(),
+				user,
+				value: message,
+				timestamp: Date.now()
+			};
+
+			pushNewMessage(newMessage, queryClient);
+		}
+
+		// wait 3 seconds, if there is no address then send message to connect wallet
+		const timeout = setTimeout(() => {
+			if (!address) {
+				pushMessage(EUser.bot, 'Hey! Please connect your wallet to interact with me 🦊');
+			} else {
+				pushMessage(EUser.bot, 'Hey! Welcome back 🦊');
+			}
+		}, 3000);
+
+		return () => clearTimeout(timeout);
+	}, [address, queryClient]);
 
 	useEffect(() => {
 		getNetworkId();
