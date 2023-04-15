@@ -30,8 +30,6 @@ const useAppHeight = () => {
 				}
 			};
 
-			/* waitForElm('#main-container').then(() => {
-			}); */
 			setHeight();
 
 			// @ts-ignore

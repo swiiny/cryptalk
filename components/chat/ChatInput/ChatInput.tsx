@@ -178,6 +178,7 @@ const ChatInput: FC<IChatInput> = () => {
 									.replaceAll('[tokenB]', parameters.tokenB.stringValue)
 									.replaceAll('[amount]', parameters.amount.numberValue.toString())
 							);
+							break;
 						default:
 							if (answer) {
 								pushMessage(EUser.bot, answer);
@@ -190,6 +191,27 @@ const ChatInput: FC<IChatInput> = () => {
 
 		setMessage('');
 	};
+
+	/* 	useEffect(() => { // used to generate dialogflow entities
+		function formatTokensToEntity() {
+			const newEntities = tokens.flatMap((token) => {
+				return token.tokens.map((_token) => {
+					return {
+						value: _token.symbol,
+						synonyms: [_token.symbol, _token.name]
+					};
+				});
+			});
+			// remove duplicates (property to check: value)
+			const uniqueEntities = newEntities.filter(
+				(thing, index, self) => index === self.findIndex((t) => t.value === thing.value)
+			);
+			console.log(uniqueEntities);
+			console.log(uniqueEntities.length);
+			console.log(newEntities.length);
+		}
+		formatTokensToEntity();
+	}, []); */
 
 	return (
 		<>

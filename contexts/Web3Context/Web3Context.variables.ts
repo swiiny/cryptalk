@@ -18,12 +18,19 @@ const NETWORKS_DATA: any = {
 		rpc: process.env.RPC_ETHEREUM,
 		networkId: 1
 	} as INetwork,
-	avalanche: {
-		id: 'avalanche',
-		name: 'Avalanche',
-		ticker: 'AVAX',
-		rpc: process.env.RPC_AVALANCHE,
-		networkId: 43114
+	polygon: {
+		id: 'polygon',
+		name: 'Polygon',
+		ticker: 'MATIC',
+		rpc: process.env.RPC_POLYGON,
+		networkId: 137
+	} as INetwork,
+	bsc: {
+		id: 'bsc',
+		name: 'Binance Smart Chain',
+		ticker: 'BNB',
+		rpc: process.env.RPC_BSC,
+		networkId: 56
 	} as INetwork
 };
 
@@ -31,7 +38,8 @@ const NETWORKS_RPC: {
 	[x: number]: string;
 } = {
 	[NETWORKS_DATA.ethereum.networkId]: NETWORKS_DATA.ethereum.rpc,
-	[NETWORKS_DATA.avalanche.networkId]: NETWORKS_DATA.avalanche.rpc
+	[NETWORKS_DATA.bsc.networkId]: NETWORKS_DATA.bsc.rpc,
+	[NETWORKS_DATA.polygon.networkId]: NETWORKS_DATA.polygon.rpc
 };
 
 const VALID_CHAIN_IDS: number[] = (Object.values(NETWORKS_DATA) as INetwork[])

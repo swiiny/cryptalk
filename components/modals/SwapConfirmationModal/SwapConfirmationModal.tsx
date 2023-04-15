@@ -8,7 +8,6 @@ import { ENetwork } from '@contexts/SwapContext/SwapContext.enum';
 import { IToken } from '@contexts/SwapContext/SwapContext.type';
 import { useQuote } from '@hooks/1inch/useQuote/useQuote';
 import useWeb3 from '@hooks/useWeb3';
-import { useQueryClient } from '@tanstack/react-query';
 import { tokens } from '@utils/tokens';
 import { ethers } from 'ethers';
 import { FC, MouseEvent, useEffect, useId, useMemo, useState } from 'react';
@@ -20,16 +19,16 @@ import { ISwapConfirmationModal } from './SwapConfirmationModal.type';
 
 const networks = Object.values(ENetwork).map((network) => Number(network));
 
-interface IFormattedSwapData {
+export interface IFormattedSwapData {
 	tokenA: IToken;
 	tokenB: IToken;
 	amount: string;
 	minimumReceived: string;
 	slippage: string;
+	isReady?: boolean;
 }
 
 const SwapConfirmationModal: FC<ISwapConfirmationModal> = ({ isOpen = false, onClose = () => {}, swapData }) => {
-	const queryClient = useQueryClient();
 	const { networkId, fusionSwap } = useWeb3();
 	const { tokenA: tokenASymbol, tokenB: tokenBSymbol, amount, slippage } = swapData;
 	const [formattedSwapData, setFormattedSwapData] = useState<IFormattedSwapData>();
@@ -64,6 +63,8 @@ const SwapConfirmationModal: FC<ISwapConfirmationModal> = ({ isOpen = false, onC
 		try {
 			const tokensForUserNetwork = tokens.find(({ network }) => `${network}` === `${networkId}`);
 
+			console.log('tokensForUserNetwork', tokensForUserNetwork);
+
 			if (!tokensForUserNetwork) {
 				const supprotedNetworks = Object.keys(ENetwork)
 					.map((key) => {
@@ -95,12 +96,15 @@ const SwapConfirmationModal: FC<ISwapConfirmationModal> = ({ isOpen = false, onC
 				.parseUnits((amount * (1 - slippage / 100)).toString(), _tokenB.decimals)
 				.toString();
 
+			console.log('new amount', formattedAmount);
+
 			setFormattedSwapData({
 				tokenA: _tokenA,
 				tokenB: _tokenB,
 				amount: formattedAmount,
 				minimumReceived: formattedMinimumReceived,
-				slippage: formattedSlippage + '%'
+				slippage: formattedSlippage + '%',
+				isReady: true
 			});
 		} catch {}
 	}, [amount, isValidNetwork, networkId, slippage, tokenASymbol, tokenBSymbol]);
@@ -173,9 +177,10 @@ const SwapConfirmationModal: FC<ISwapConfirmationModal> = ({ isOpen = false, onC
 						<Button
 							width={'100%'}
 							mdWidth={'50%'}
-							//onClick={() => setConfirmationModalOpen(true)}
+							onClick={formattedSwapData?.isReady ? () => fusionSwap(formattedSwapData) : undefined}
+							disabled={!formattedSwapData?.isReady}
 							gradientContainerProps={{
-								background: theme.colors.success
+								background: formattedSwapData?.isReady ? theme.colors.success : theme.colors.success + '20'
 							}}
 						>
 							Swap

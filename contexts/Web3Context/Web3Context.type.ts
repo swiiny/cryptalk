@@ -1,4 +1,4 @@
-import { TSwapData } from '@components/chat/ChatInput/ChatInput.type';
+import { IFormattedSwapData } from '@components/modals/SwapConfirmationModal/SwapConfirmationModal';
 import { IWallet } from '@interfaces/wallet';
 import Address from '@models/Address';
 import WalletConnectProvider from '@walletconnect/web3-provider';
@@ -15,7 +15,7 @@ interface IWeb3 {
 	isValidNetwork: boolean;
 	connectWallet: (wallet: IWallet) => void;
 	disconnectWallet: () => void;
-	fusionSwap: (swapData: TSwapData) => Promise<void>;
+	fusionSwap: (swapData: IFormattedSwapData) => Promise<void>;
 }
 
 interface IWeb3Provider {

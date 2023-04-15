@@ -1,12 +1,11 @@
+import { FusionSDK } from '@1inch/fusion-sdk';
 import { EUser } from '@components/chat/ChatInput/ChatInput';
-import { TSwapData } from '@components/chat/ChatInput/ChatInput.type';
-import { ENetwork } from '@contexts/SwapContext/SwapContext.enum';
+import { IFormattedSwapData } from '@components/modals/SwapConfirmationModal/SwapConfirmationModal';
 import { pushNewMessage } from '@hooks/chat/useMessagesQuery/useMessagesQuery';
 import { IMessage } from '@hooks/chat/useMessagesQuery/useMessagesQuery.type';
 import MetaMaskSDK from '@metamask/sdk';
 import Address from '@models/Address';
 import { useQueryClient } from '@tanstack/react-query';
-import { tokens } from '@utils/tokens';
 import { ethers, providers } from 'ethers';
 import { IWallet } from 'interfaces/wallet';
 import { FC, ReactNode, createContext, useCallback, useEffect, useState } from 'react';
@@ -27,6 +26,18 @@ const mmOptions = {
 	rpc: 'https://mainnet.infura.io/v3/',
 	infuraId: process.env.INFURA_API_KEY
 };
+
+async function wrapNativeToken(wrapTokenAddress: string, amount: string, provider?: providers.Web3Provider) {
+	if (!provider) {
+		throw new Error('Provider is not defined');
+	}
+	const signer = provider.getSigner();
+	const contract = new ethers.Contract(wrapTokenAddress, ['function wrap() payable'], signer);
+	const tx = await contract.wrap({
+		value: ethers.utils.parseEther(amount).div(ethers.BigNumber.from(10).pow(18))
+	});
+	await tx.wait();
+}
 
 let MMSDK: MetaMaskSDK;
 
@@ -131,7 +142,7 @@ const Web3Provider: FC<{ children: ReactNode }> = ({ children }) => {
 			}
 
 			if (networkId) {
-				if (`${chainId}`.startsWith('0x')) {
+				if (`${networkId}`.startsWith('0x')) {
 					const intNetworkId = parseInt(`${networkId}`, 16);
 
 					setNetworkId(intNetworkId);
@@ -186,42 +197,126 @@ const Web3Provider: FC<{ children: ReactNode }> = ({ children }) => {
 	}, []);
 
 	const fusionSwap = useCallback(
-		async ({ tokenA: tokenASymbol, tokenB: tokenBSymbol, amount, slippage }: TSwapData) => {
+		async ({ tokenA, tokenB, amount, minimumReceived, slippage }: IFormattedSwapData) => {
 			try {
-				const tokensForUserNetwork = tokens.find(({ network }) => `${network}` === `${networkId}`);
-
-				if (!tokensForUserNetwork) {
-					const supprotedNetworks = Object.keys(ENetwork)
-						.map((key) => {
-							// capitalize first letter
-							return '- ' + key.charAt(0).toUpperCase() + key.slice(1);
-						})
-						.join('\n');
-
-					const newMessage: IMessage = {
-						id: uuidv4(),
-						user: EUser.bot,
-						value: `Please connect your wallet to one of the supported networks\n${supprotedNetworks}`,
-						timestamp: Date.now()
-					};
-
-					pushNewMessage(newMessage, queryClient);
-					return;
+				if (!address) {
+					throw new Error('No address found');
 				}
 
-				const _tokenA = tokensForUserNetwork?.tokens.find(
-					({ symbol }) => symbol.toLowerCase() === tokenASymbol?.toLowerCase()
-				);
-				const _tokenB = tokensForUserNetwork?.tokens.find(
-					({ symbol }) => symbol.toLowerCase() === tokenBSymbol?.toLowerCase()
-				);
+				if (!networkId) {
+					throw new Error('No network id found');
+				}
 
-				console.log('tokens to swap', _tokenA, _tokenB);
+				if (tokenA.address === '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee') {
+					let wrappedNativeTokenAddress = '';
+					// get Wrapped Native
+					if (networkId === 137) {
+						wrappedNativeTokenAddress = '0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270';
+					} else if (networkId === 56) {
+						wrappedNativeTokenAddress = '0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c';
+					} else if (networkId === 1) {
+						wrappedNativeTokenAddress = '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2';
+					}
+
+					// update tokenA address to be the wrapped native token address
+					tokenA.address = wrappedNativeTokenAddress;
+
+					// need to wrap
+					await wrapNativeToken(wrappedNativeTokenAddress, amount, provider.web3Provider);
+				}
+
+				/* const blockchainProvider = new sdk.api.({
+					provider: provider.web3Provider
+				});
+ */
+
+				/* 		{
+						fromTokenAddress: '0xbd1463f02f61676d53fd183c2b19282bff93d099',
+						toTokenAddress: '0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270',
+						amount: '267650763756631830',
+						walletAddress: '0x344A821f89b71E96B7e2f7af5a42d45b474D041e'
+					}
+ */
+				tokenA.address = '0xbd1463f02f61676d53fd183c2b19282bff93d099';
+				tokenB.address = '0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270';
+				amount = '267650763756631830';
+
+				//const signer = provider?.web3Instance?.getSigner();
+
+				const sdk = new FusionSDK({
+					url: 'https://fusion.1inch.io',
+					network: networkId,
+					blockchainProvider: provider.web3Instance
+				});
+
+				const order = await sdk.createOrder({
+					fromTokenAddress: tokenA.address,
+					toTokenAddress: tokenB.address,
+
+					amount: amount,
+					walletAddress: address.toString()
+				});
+
+				console.log('order', order);
+				/* 
+				// Sign the typed data
+				const signature = await provider.web3Instance.send('eth_signTypedData_v4', [
+					address.toString(),
+					JSON.stringify(order)
+				]);
+ */
+				//console.log('signature', signature);
+
+				// Submit the order
+				//const submitOrderRes = await sdk.submitOrder(order.order, order.quoteId);
+				//console.log('submitOrderRes', submitOrderRes);
+				/* 
+				order: LimitOrderV3Struct;
+				signature: string;
+				quoteId: string;
+				orderHash: string; */
+
+				/* 				export declare type OrderParams = {
+    fromTokenAddress: string;
+    toTokenAddress: string;
+    amount: string;
+    walletAddress: string;
+    permit?: string;
+    receiver?: string;
+    preset?: PresetEnum;
+    nonce?: OrderNonce | string | number;
+    fee?: TakingFeeInfo;
+};
+
+			 */ //blockchainProvider;
+				//httpProvider;
+
+				/* 	console.log('networkId', networkId);
+
+				console.log('debug', { tokenA, tokenB, amount, minimumReceived, slippage });
+				sdk
+					.placeOrder({
+						fromTokenAddress: tokenA.address,
+						toTokenAddress: tokenB.address,
+						amount: amount,
+						walletAddress: address.toString()
+					}) */
+				/* 
+				const res = sdk
+					.placeOrder({
+						fromTokenAddress: '0xbd1463f02f61676d53fd183c2b19282bff93d099',
+						toTokenAddress: '0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270',
+						amount: '267650763756631830',
+						walletAddress: '0x344A821f89b71E96B7e2f7af5a42d45b474D041e'
+					}) 
+					.then(console.log)
+					.catch(console.error);
+					*/
 			} catch (err) {
-				console.error('buildTx', err);
+				console.error(err);
 			}
 		},
-		[networkId, queryClient]
+		[address, networkId, provider.web3Instance, provider.web3Provider]
 	);
 
 	useEffect(() => {

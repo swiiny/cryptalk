@@ -29,6 +29,8 @@ async function fetchQuote(fromTokenAddress?: string, toTokenAddress?: string, am
 }
 
 export function useQuote(fromTokenAddress?: string, toTokenAddress?: string, amount?: string, networkId?: number) {
+	console.log({ fromTokenAddress, toTokenAddress, amount, networkId });
+
 	const { data, isLoading, isError } = useQuery({
 		queryKey: [fromTokenAddress, toTokenAddress, amount, networkId],
 		queryFn: () => fetchQuote(fromTokenAddress, toTokenAddress, amount, networkId),
@@ -36,7 +38,7 @@ export function useQuote(fromTokenAddress?: string, toTokenAddress?: string, amo
 		refetchOnWindowFocus: false,
 		refetchOnMount: false,
 		retry: false,
-		staleTime: 1000 * 10,
+		staleTime: 5,
 		refetchInterval: process.env.NODE_ENV === 'development' ? undefined : 1000 * 10
 	});
 
