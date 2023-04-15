@@ -10,7 +10,7 @@ const useAppHeight = () => {
 			const setHeight = () => {
 				const windowHeight = window.innerHeight;
 
-				let value = `${Math.floor(windowHeight - 50)}px`;
+				let value = `${Math.floor(windowHeight - 20)}px`;
 
 				const styleId = 'style-app-height';
 
