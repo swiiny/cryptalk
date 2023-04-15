@@ -285,7 +285,10 @@ const Web3Provider: FC<{ children: ReactNode }> = ({ children }) => {
 		// wait 3 seconds, if there is no address then send message to connect wallet
 		const timeout = setTimeout(() => {
 			if (!address) {
-				pushMessage(EUser.bot, 'Please connect your wallet to interact with me 🦊');
+				pushMessage(
+					EUser.bot,
+					'Please connect your wallet to interact with me 🦊\nOnce connected, I will be able to help you to swap tokens 🚀'
+				);
 			} else {
 				// remove last 4 chars from ens
 				const formattedEns = ens?.replace(/.{4}$/, '');
