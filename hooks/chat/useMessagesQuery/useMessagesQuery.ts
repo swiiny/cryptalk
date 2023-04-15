@@ -19,7 +19,8 @@ export function pushNewMessage(newMessage: IMessage, queryClient: QueryClient) {
 function useMessagesQuery() {
 	const { data: messages = [] } = useQuery<IMessage[], Error>({
 		queryKey: ['messages'],
-		queryFn: fetchMessages
+		queryFn: fetchMessages,
+		staleTime: Infinity
 	});
 
 	// generate conversation history for GPT-3.5

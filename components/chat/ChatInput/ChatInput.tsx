@@ -142,7 +142,7 @@ const ChatInput: FC<IChatInput> = () => {
 
 			let newQuestion =
 				currentPrompt +
-				" How should the AI bot ask the user for any missing swap data (tokenA, tokenB, amount, slippage)? Make sure to include a code-parsable string at the end of your response with user selected values or null in the format 'responseForCode: tokenA, tokenB, amount, slippage'. ";
+				" How should the AI bot ask the user for any missing swap data? Make sure to include a code-parsable string at the end of your response with user selected values or null in the format 'responseForCode: tokenA, tokenB, amount, slippage'. ";
 
 			const { tokenA, tokenB, amount, slippage } = userIntent || {
 				tokenA: null,
@@ -151,24 +151,24 @@ const ChatInput: FC<IChatInput> = () => {
 				slippage: null
 			};
 
-			/* 		conversationHistory += `Context: The user wants to swap tokens. So far, they have provided the following information:\n`;
+			conversationHistory += `Context: The user wants to swap tokens. So far, they have provided the following information:\n`;
 			conversationHistory += `TokenA: ${tokenA}\n`;
 			conversationHistory += `TokenB: ${tokenB}\n`;
 			conversationHistory += `Amount: ${amount}\n`;
 			conversationHistory += `Slippage: ${slippage}\n`;
 
 			console.log('conversationHistory', conversationHistory);
-			newPrompt = `${conversationHistory}${newQuestion} `; */
+			newPrompt = `${conversationHistory}${newQuestion} `;
 
 			let contextSummary = '';
-			contextSummary += `Context: The user wants to swap tokens. So far, they have provided the following information:\n`;
+			contextSummary += `\nContext: The user wants to swap an amount of tokenA to tokenB with a slipapge tolerance. So far, they have provided the following information:\n`;
 			contextSummary += `TokenA: ${tokenA}\n`;
 			contextSummary += `TokenB: ${tokenB}\n`;
 			contextSummary += `Amount: ${amount}\n`;
 			contextSummary += `Slippage: ${slippage}\n`;
 
 			console.log('contextSummary', contextSummary);
-			newPrompt = `${contextSummary}${newQuestion} `;
+			newPrompt = `${conversationHistory}${contextSummary}${newQuestion} `;
 
 			openAIMutation.mutate(newPrompt, {
 				onSuccess: async (aiResponse) => {
@@ -180,14 +180,10 @@ const ChatInput: FC<IChatInput> = () => {
 					userIntent = extractUserIntentFromResponse(aiResponse);
 
 					// check if the user has confirmed the information
-					if (userResponse.includes('CONFIRMED')) {
+					if (aiResponse.includes('CONFIRMED')) {
 						alert("it's confirmed");
 						// can build the tx
-						return;
-					}
-
-					if (isComplete(userIntent)) {
-						// can build the tx
+						//buildTx(userIntent);
 						return;
 					}
 
