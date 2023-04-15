@@ -2,7 +2,7 @@ import Address from '@models/Address';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import { ethers, providers } from 'ethers';
 import { IWallet } from 'interfaces/wallet';
-import React, { createContext, FC, ReactNode, useCallback, useEffect, useState } from 'react';
+import { FC, ReactNode, createContext, useCallback, useEffect, useState } from 'react';
 import { clearLocalStorage, getLocalStorage, setLocalStorage } from 'utils/global';
 import { checkIfNetworkIsValid, getWalletFromName } from './Web3Context.functions';
 import { IWeb3, IWeb3Provider } from './Web3Context.type';

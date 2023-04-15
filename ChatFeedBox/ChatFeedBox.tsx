@@ -2,7 +2,7 @@ import { GradientContainer } from '@components/shared/GradientContainer/Gradient
 import Text from '@components/shared/Text';
 import { ETextType } from '@components/shared/Text/Text.enum';
 import { ESize } from '@theme/theme.enum';
-import { FC } from 'react';
+import { FC, Fragment } from 'react';
 import { useTheme } from 'styled-components';
 import { StyledChatFeedBox } from './ChatFeedBox.styles';
 import { IChatFeedBox } from './ChatFeedBox.type';
@@ -11,6 +11,27 @@ const ChatFeedBox: FC<IChatFeedBox> = ({ id, user, value, timestamp }) => {
 	const theme = useTheme();
 
 	const isUser = user === 'User';
+
+	const formattedValue = () => {
+		if (!value) {
+			return <></>;
+		}
+
+		const valueWithBreaks = value.replaceAll('\n', '<br />');
+
+		return (
+			<>
+				{valueWithBreaks?.split('<br />').map((line, index) => {
+					return (
+						<Fragment key={`line-${index}`}>
+							{line}
+							<br />
+						</Fragment>
+					);
+				})}
+			</>
+		);
+	};
 
 	return (
 		<StyledChatFeedBox className={!isUser ? 'is-left' : 'is-right'}>
@@ -24,7 +45,7 @@ const ChatFeedBox: FC<IChatFeedBox> = ({ id, user, value, timestamp }) => {
 				background={isUser ? theme.colors.darkGradient : theme.colors.blueGradient}
 			>
 				<Text type={ETextType.p} size={ESize.m}>
-					{value}
+					{formattedValue()}
 				</Text>
 			</GradientContainer>
 		</StyledChatFeedBox>

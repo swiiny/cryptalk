@@ -5,19 +5,17 @@ const projectId = process.env.DIALOGFLOW_PROJECT_ID || '';
 const languageCode = 'en-US';
 
 // import credentials from '../../private/appogee-dev-api-10fa1401f35c.json';
-import credentials from '../../private/appogee-dev-api-215ed7f0fb90.json';
-console.log(credentials);
+import credentials from '../../private/cryptalk-383723-3589ec633636.json';
 
 //const sessionClient = new dialogflow.SessionsClient();
 
-async function sendMessageToDialogflow(text: string) {
+async function sendMessageToDialogflow(text: string, sessionId: string) {
 	if (!projectId) {
 		throw new Error('Project ID is required');
 	}
 
 	//const sessionPath = sessionClient.projectAgentSessionPath(projectId, sessionId);
-	const sessionClient = new dialogflow.SessionsClient({ projectId, credentials });
-	const sessionId = 'some-random-id'; // Change this for different users/sessions
+	const sessionClient = new dialogflow.SessionsClient({ credentials });
 	const sessionPath = sessionClient.projectAgentSessionPath(projectId, sessionId);
 
 	const request = {
@@ -42,9 +40,9 @@ async function sendMessageToDialogflow(text: string) {
 
 export default async function handler(req, res) {
 	if (req.method === 'POST') {
-		const { message } = req.body;
+		const { message, sessionId } = req.body;
 		try {
-			const response = await sendMessageToDialogflow(message);
+			const response = await sendMessageToDialogflow(message, sessionId);
 			res.status(200).json(response);
 		} catch (error) {
 			console.error('Dialogflow error:', error);
