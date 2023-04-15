@@ -1,6 +1,6 @@
 # Cryptalk
 
-Cryptalk is an innovative and user-centric platform that simplifies the process of cryptocurrency swaps through the power of natural language processing. By leveraging the Dialogflow platform, Cryptalk creates an intuitive and engaging conversational interface that effectively extracts swap-related information from users, streamlining the swap process and ensuring a seamless experience.
+Cryptalk is an innovative and user-centric platform, developed as part of the [ETHTokyo 2023](https://ethglobal.com/events/tokyo) hackathon, that simplifies the process of cryptocurrency swaps through the power of natural language processing. By leveraging the Dialogflow platform, Cryptalk creates an intuitive and engaging conversational interface that effectively extracts swap-related information from users, streamlining the swap process and ensuring a seamless experience.
 
 ## Features
 
