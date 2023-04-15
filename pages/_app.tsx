@@ -12,7 +12,7 @@ import { darkTheme } from 'theme/theme';
 export const globalQueryConfig: QueryClientConfig = {
 	defaultOptions: {
 		queries: {
-			staleTime: Infinity
+			staleTime: 5 * 60 * 1000
 		}
 	}
 };
