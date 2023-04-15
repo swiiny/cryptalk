@@ -7,7 +7,6 @@ import MetaMaskSDK from '@metamask/sdk';
 import Address from '@models/Address';
 import { useQueryClient } from '@tanstack/react-query';
 import { tokens } from '@utils/tokens';
-import WalletConnectProvider from '@walletconnect/web3-provider';
 import { ethers, providers } from 'ethers';
 import { IWallet } from 'interfaces/wallet';
 import { FC, ReactNode, createContext, useCallback, useEffect, useState } from 'react';
@@ -15,7 +14,7 @@ import { clearLocalStorage, getLocalStorage, setLocalStorage } from 'utils/globa
 import { v4 as uuidv4 } from 'uuid';
 import { checkIfNetworkIsValid, getWalletFromName } from './Web3Context.functions';
 import { IWeb3, IWeb3Provider } from './Web3Context.type';
-import { NETWORKS_RPC, WALLETS } from './Web3Context.variables';
+import { WALLETS } from './Web3Context.variables';
 
 // the key used to save the state in localStorage
 const WalletLocalStorageKey = 'wallet';
@@ -29,6 +28,8 @@ const mmOptions = {
 	infuraId: process.env.INFURA_API_KEY
 };
 
+let MMSDK: MetaMaskSDK;
+
 const defaultProvider = { error: true };
 const Web3Provider: FC<{ children: ReactNode }> = ({ children }) => {
 	const [provider, setProvider] = useState<IWeb3Provider>({ error: true });
@@ -36,7 +37,6 @@ const Web3Provider: FC<{ children: ReactNode }> = ({ children }) => {
 	const [networkId, setNetworkId] = useState<number | undefined>(undefined);
 	const [isWalletConnected, setIsWalletConnected] = useState<boolean>(false);
 	const [walletName, setWalletName] = useState<string | undefined>(undefined);
-	const [isWalletModalOpen, setIsWalletModalOpen] = useState<boolean>(false);
 	const [isConnectingWallet, setIsConnectingWallet] = useState<boolean>(false);
 	const [isValidNetwork, setIsValidNetwork] = useState<boolean>(false);
 	const [ens, setEns] = useState<string | undefined>(undefined);
@@ -68,33 +68,27 @@ const Web3Provider: FC<{ children: ReactNode }> = ({ children }) => {
 							disconnectWallet();
 						}
 					});
-
-					// used to detect if the user disconnect himself from WalletConnect
-					provider.on('disconnect', async () => {
-						// check if the wallet is WalletConnect because if it's metamask then it's triggered when change to a none supported network
-						if (walletName === WALLETS.walletConnect.name) {
-							disconnectWallet();
-						}
-					});
 				} catch (err) {
 					console.error('Error while initializing web3 listeners', err);
 				}
 			}
 		},
-		[disconnectWallet, walletName]
+		[disconnectWallet]
 	);
 
 	const connectWallet = useCallback(
 		async (wallet: IWallet) => {
 			setIsConnectingWallet(true);
 
-			try {
-				let newProvider;
+			if (address) {
+				console.log('already connected');
+				return;
+			}
 
+			try {
 				switch (wallet.name) {
 					case WALLETS.metamask.name:
-						const MMSDK = new MetaMaskSDK(mmOptions);
-
+						console.log('connecting to metamask');
 						const ethereum = MMSDK.getProvider();
 
 						const web3provider = new providers.Web3Provider(ethereum);
@@ -111,36 +105,12 @@ const Web3Provider: FC<{ children: ReactNode }> = ({ children }) => {
 						initWeb3Listeners(ethereum);
 
 						break;
-					case WALLETS.walletConnect.name:
-						newProvider = new WalletConnectProvider({
-							rpc: NETWORKS_RPC
-						});
-
-						// or
-						// newProvider = new WalletConnectProvider({
-						// 	infuraId: YOUR_INFURA_ID // Required
-						// });
-
-						await newProvider.enable();
-
-						const web3Provider = new providers.Web3Provider(newProvider);
-						setProvider({
-							web3Provider,
-							web3Instance: newProvider
-						});
-
-						setAddress(Address.from(newProvider?.accounts[0]));
-
-						initWeb3Listeners(newProvider);
-
-						break;
 					default:
 						break;
 				}
 
 				setLocalStorage(WalletLocalStorageKey, wallet.name);
 				setWalletName(wallet.name);
-				setIsWalletModalOpen(false);
 				setIsWalletConnected(true);
 				setIsConnectingWallet(false);
 			} catch (err) {
@@ -149,7 +119,7 @@ const Web3Provider: FC<{ children: ReactNode }> = ({ children }) => {
 				disconnectWallet();
 			}
 		},
-		[disconnectWallet, initWeb3Listeners]
+		[address, disconnectWallet, initWeb3Listeners]
 	);
 
 	const getNetworkId = async (chainId?: number) => {
@@ -320,6 +290,10 @@ const Web3Provider: FC<{ children: ReactNode }> = ({ children }) => {
 		}
 	}, [address]);
 
+	useEffect(() => {
+		MMSDK = new MetaMaskSDK(mmOptions);
+	}, []);
+
 	return (
 		<Web3Context.Provider
 			value={{
@@ -333,8 +307,6 @@ const Web3Provider: FC<{ children: ReactNode }> = ({ children }) => {
 				ens,
 				isConnectingWallet,
 				isValidNetwork,
-				isWalletModalOpen,
-				setIsWalletModalOpen,
 				fusionSwap
 			}}
 		>

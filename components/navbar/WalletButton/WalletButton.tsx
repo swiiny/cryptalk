@@ -3,24 +3,21 @@ import { IWalletButton } from './WalletButton.type';
 
 import useWeb3 from '@hooks/useWeb3';
 
-import { MdOutlineAccountBalanceWallet } from 'react-icons/md';
+import { WALLETS } from '@contexts/Web3Context/Web3Context.variables';
 import { useTheme } from 'styled-components';
 import Button from '../../shared/Button';
-import WalletModal from '../WalletModal';
 
 const WalletButton: FC<IWalletButton> = () => {
-	const { isWalletModalOpen, setIsWalletModalOpen, address, isWalletConnected, ens } = useWeb3();
+	const { connectWallet, address, isWalletConnected, ens, disconnectWallet } = useWeb3();
 	const theme = useTheme();
 
 	return (
 		<>
-			<WalletModal isOpen={isWalletModalOpen} onClose={() => setIsWalletModalOpen(false)} />
 			<Button
-				onClick={() => setIsWalletModalOpen(true)}
+				onClick={!!address ? () => disconnectWallet() : () => connectWallet(WALLETS.metamask)}
 				color={isWalletConnected ? theme.colors.lightBlue : theme.colors.white}
-				icon={<MdOutlineAccountBalanceWallet size={28} />}
 			>
-				{isWalletConnected ? ens || address?.truncate() : 'Connect Wallet'}
+				{isWalletConnected ? ens || address?.truncate() : 'Connect Wallet 🦊'}
 			</Button>
 		</>
 	);

@@ -5,10 +5,6 @@ const WALLETS = {
 	metamask: {
 		name: 'MetaMask',
 		srcLogo: '/assets/logo-metamask-color.svg'
-	} as IWallet,
-	walletConnect: {
-		name: 'Wallet Connect',
-		srcLogo: '/assets/logo-wallet-connect-color.svg'
 	} as IWallet
 };
 

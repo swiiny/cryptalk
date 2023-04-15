@@ -1,13 +1,14 @@
 import { SwapConfirmationModal } from '@components/modals/SwapConfirmationModal/SwapConfirmationModal';
 import { Button } from '@components/shared/Button/Button';
 import { ENetwork } from '@contexts/SwapContext/SwapContext.enum';
+import { WALLETS } from '@contexts/Web3Context/Web3Context.variables';
 import { useDialogFlowMutation } from '@hooks/chat/useDialogFlowMutation/useDialogFlowMutation';
 import { pushNewMessage } from '@hooks/chat/useMessagesQuery/useMessagesQuery';
 import { IMessage } from '@hooks/chat/useMessagesQuery/useMessagesQuery.type';
 import { useWeb3 } from '@hooks/useWeb3/useWeb3';
 import { useQueryClient } from '@tanstack/react-query';
 import { tokens } from '@utils/tokens';
-import { FC, FormEvent, useEffect, useState } from 'react';
+import { FC, FormEvent, useState } from 'react';
 import { useTheme } from 'styled-components';
 import { v4 as uuidv4 } from 'uuid';
 import { StyledChatInput } from './ChatInput.styles';
@@ -22,7 +23,7 @@ const ChatInput: FC<IChatInput> = () => {
 	const queryClient = useQueryClient();
 	const theme = useTheme();
 	const [message, setMessage] = useState('');
-	const { address, setIsWalletModalOpen } = useWeb3();
+	const { address, connectWallet } = useWeb3();
 	const [swapData, setSwapData] = useState<TSwapData>({});
 	/* const [swapData, setSwapData] = useState<TSwapData>({
 		tokenA: 'USDC',
@@ -32,10 +33,6 @@ const ChatInput: FC<IChatInput> = () => {
 		isReadyToSwap: true
 	}); */
 	const [isConfirmationModalOpen, setConfirmationModalOpen] = useState(false);
-	//const [isConfirmationModalOpen, setConfirmationModalOpen] = useState(true);
-
-	//const openAIMutation = useOpenAIMutation();
-	//const [inputType, setInputType] = useState<EInputType>(EInputType.selectAction);
 	const { mutate } = useDialogFlowMutation();
 
 	function pushMessage(user: EUser, message: string) {
@@ -194,37 +191,6 @@ const ChatInput: FC<IChatInput> = () => {
 		setMessage('');
 	};
 
-	useEffect(() => {
-		/* 	function formatTokensToEntity() {
-			const newEntities = tokens.flatMap((token) => {
-				return token.tokens.map((_token) => {
-					return {
-						value: _token.symbol,
-						synonyms: [_token.symbol, _token.name]
-					};
-				});
-			});
-
-			// remove duplicates (property to check: value)
-			const uniqueEntities = newEntities.filter(
-				(thing, index, self) => index === self.findIndex((t) => t.value === thing.value)
-			);
-
-			console.log(uniqueEntities);
-			console.log(uniqueEntities.length);
-			console.log(newEntities.length);
-		} 
-
-		// can you do the same format for ENetworks?
-	const networks = Object.entries(ENetwork).map(([key, value]) => {
-			return {
-				value: key,
-				synonyms: [key, 'network id ' + value, 'chain id ' + value]
-			};
-		}); 
-		*/
-	}, []);
-
 	return (
 		<>
 			<SwapConfirmationModal
@@ -237,12 +203,12 @@ const ChatInput: FC<IChatInput> = () => {
 				{!address ? (
 					<Button
 						width={'100%'}
-						onClick={() => setIsWalletModalOpen(true)}
+						onClick={() => connectWallet(WALLETS.metamask)}
 						gradientContainerProps={{
 							background: theme.colors.darkGradient
 						}}
 					>
-						Connect Wallet
+						Connect Wallet 🦊
 					</Button>
 				) : (
 					<form

@@ -9,13 +9,11 @@ interface IWeb3 {
 	address: Address | undefined;
 	networkId: number | undefined;
 	isWalletConnected: boolean;
-	isWalletModalOpen: boolean;
 	walletName: string | undefined;
 	ens: string | undefined;
 	isConnectingWallet: boolean;
 	isValidNetwork: boolean;
 	connectWallet: (wallet: IWallet) => void;
-	setIsWalletModalOpen: (newState: boolean) => void;
 	disconnectWallet: () => void;
 	fusionSwap: (swapData: TSwapData) => Promise<void>;
 }
