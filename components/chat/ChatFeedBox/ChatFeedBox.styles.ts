@@ -7,4 +7,18 @@ export const StyledChatFeedBox = styled.li`
 	max-width: 60%;
 
 	${addTransition()}
+
+	overflow: hidden;
+
+	& > div {
+		&.is-left {
+			width: 100%;
+		}
+
+		& > p {
+			width: 100%;
+			overflow-wrap: break-word;
+			hyphens: none;
+		}
+	}
 `;

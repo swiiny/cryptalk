@@ -1,5 +1,5 @@
+import { ChatFeedBox } from '@components/chat/ChatFeedBox/ChatFeedBox';
 import useMessagesQuery from '@hooks/chat/useMessagesQuery';
-import { ChatFeedBox } from 'ChatFeedBox/ChatFeedBox';
 import { FC, useEffect } from 'react';
 import { StyledChatFeed } from './ChatFeed.styles';
 import { IChatFeed } from './ChatFeed.type';

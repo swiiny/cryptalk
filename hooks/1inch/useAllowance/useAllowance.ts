@@ -42,7 +42,8 @@ function useAllowance(
 			);
 			return response.data;
 		},
-		enabled: !!tokenAddress && !!amount && parseInt(allowance) < parseInt(amount)
+		enabled: !!tokenAddress && !!amount && parseInt(allowance) < parseInt(amount),
+		staleTime: 0
 	});
 
 	const isNative = tokenAddress?.toLowerCase() === '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
