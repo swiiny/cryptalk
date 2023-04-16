@@ -214,7 +214,7 @@ const SwapConfirmationModal: FC<ISwapConfirmationModal> = ({ isOpen = false, onC
 			<StyledModalBackground
 				className='modal-background'
 				isVisible={isModalVisible && isOpen}
-				onClick={(e: MouseEvent<HTMLButtonElement, globalThis.MouseEvent>) => closeModal(e)}
+				//onClick={(e: MouseEvent<HTMLButtonElement, globalThis.MouseEvent>) => closeModal(e)}
 			>
 				<GradientContainer
 					direction={EFlex.column}

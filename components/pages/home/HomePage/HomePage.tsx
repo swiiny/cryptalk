@@ -11,7 +11,10 @@ const HomePage: FC<IHomePage> = () => {
 
 	return (
 		<>
-			<Meta title='Cryptalk' description='' />
+			<Meta
+				title='Cryptalk'
+				description='🤖 User-friendly crypto swaps via intuitive conversational interface. #ETHTokyo2023 #Cryptalk'
+			/>
 			<div>
 				<StyledMainContainer className='main-container'>
 					<SwapContextProvider>
