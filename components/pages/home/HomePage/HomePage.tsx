@@ -1,6 +1,5 @@
 import { ChatContainer } from '@components/chat/ChatContainer/ChatContainer';
 import Meta from '@components/shared/Meta';
-import { SwapContextProvider } from '@contexts/SwapContext/SwapContext';
 import { useAppHeight } from '@hooks/useAppHeight/useAppHeight';
 import { FC } from 'react';
 import { StyledMainContainer } from './HomePage.styles';
@@ -17,9 +16,7 @@ const HomePage: FC<IHomePage> = () => {
 			/>
 			<div>
 				<StyledMainContainer className='main-container'>
-					<SwapContextProvider>
-						<ChatContainer />
-					</SwapContextProvider>
+					<ChatContainer />
 				</StyledMainContainer>
 
 				<footer></footer>

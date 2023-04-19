@@ -6,12 +6,11 @@ import { Text } from '@components/shared/Text/Text';
 import { ETextAlign, ETextType } from '@components/shared/Text/Text.enum';
 import Flex from '@components/shared/layout/Flex';
 import { EFlex } from '@components/shared/layout/Flex/Flex.enum';
-import { ENetwork } from '@contexts/SwapContext/SwapContext.enum';
-import { IToken } from '@contexts/SwapContext/SwapContext.type';
-import { NETWORK_EXPLORER } from '@contexts/Web3Context/Web3Context.variables';
+import { ENetwork } from '@contexts/Web3Context/Web3Context.enum';
+import { IToken } from '@contexts/Web3Context/Web3Context.type';
 import useAllowance from '@hooks/1inch/useAllowance';
-import { useQuoteAggregator } from '@hooks/1inch/useQuoteAggergator/useQuoteAggregator';
-import useSwap from '@hooks/1inch/useSwap';
+import useFusionSwap from '@hooks/1inch/useFusionSwap';
+import useQuoteAggregator from '@hooks/1inch/useQuoteAggergator';
 import { pushNewMessage } from '@hooks/chat/useMessagesQuery/useMessagesQuery';
 import { IMessage } from '@hooks/chat/useMessagesQuery/useMessagesQuery.type';
 import useWeb3 from '@hooks/useWeb3';
@@ -19,7 +18,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { ESize } from '@theme/theme.enum';
 import { tokens } from '@utils/tokens';
 import { ethers } from 'ethers';
-import { FC, MouseEvent, useEffect, useId, useState } from 'react';
+import { FC, useEffect, useId, useState } from 'react';
 import { useTheme } from 'styled-components';
 import { v4 as uuidv4 } from 'uuid';
 import { StyledModalBackground } from './SwapConfirmationModal.styles';
@@ -37,14 +36,12 @@ export interface IFormattedSwapData {
 }
 
 const SwapConfirmationModal: FC<ISwapConfirmationModal> = ({ isOpen = false, onClose = () => {}, swapData }) => {
-	const { networkId, address, approveSpender, swapAggregator } = useWeb3();
+	const { networkId, address, approveSpender } = useWeb3();
 	const { tokenA: tokenASymbol, tokenB: tokenBSymbol, amount, slippage } = swapData;
 	const [formattedSwapData, setFormattedSwapData] = useState<IFormattedSwapData>();
 	const theme = useTheme();
 	const queryClient = useQueryClient();
-	const [swapError, setSwapError] = useState<string | null>(null);
-
-	const [swapTx, setSwapTx] = useState(null);
+	const { executeFusionSwap } = useFusionSwap();
 
 	const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
 
@@ -57,29 +54,14 @@ const SwapConfirmationModal: FC<ISwapConfirmationModal> = ({ isOpen = false, onC
 		formattedSwapData?.amount
 	);
 
-	const { isNative, allowance, callData } = useAllowance(
+	const { callData, needToIncreaseAllowance } = useAllowance(
 		networkId,
 		formattedSwapData?.tokenA.address,
 		address?.toString(),
-		formattedSwapData?.amount,
-		!!swapTx
+		formattedSwapData?.amount
 	);
 
-	useSwap(
-		(data: any) => {
-			setSwapTx({ ...data.tx, value: formattedSwapData?.amount });
-		},
-		isNative,
-		networkId,
-		allowance,
-		formattedSwapData?.tokenA.address,
-		formattedSwapData?.tokenB.address,
-		formattedSwapData?.amount,
-		address?.toString(),
-		slippage || 1
-	);
-
-	/* const {
+	/* 	const {
 		fromTokenAmount,
 		toTokenAmount,
 		fromTokenAmountInUSD,
@@ -87,7 +69,7 @@ const SwapConfirmationModal: FC<ISwapConfirmationModal> = ({ isOpen = false, onC
 		readableFromTokenAmount,
 		readableToTokenAmount
 	} = useQuote(formattedSwapData?.tokenA.address, formattedSwapData?.tokenB.address, formattedSwapData?.amount);
- */
+  */
 	const uuid = useId();
 
 	useEffect(() => {
@@ -169,15 +151,15 @@ const SwapConfirmationModal: FC<ISwapConfirmationModal> = ({ isOpen = false, onC
 		}
 	}, [isOpen, uuid]);
 
-	const closeModal = (e: MouseEvent) => {
-		// @ts-ignore
-		if (e.target?.getAttribute('class')?.includes('modal-background')) {
-			onClose();
-		}
-	};
-
 	async function executeSwap() {
-		const txHash = await swapAggregator(swapTx);
+		const fusionSwapRes = await executeFusionSwap(
+			formattedSwapData?.tokenA,
+			formattedSwapData?.tokenB,
+			formattedSwapData?.amount
+		);
+
+		console.log('fusionSwapRes', fusionSwapRes);
+		/* const txHash = await swapAggregator(swapTx);
 
 		if (txHash) {
 			onClose();
@@ -202,7 +184,7 @@ const SwapConfirmationModal: FC<ISwapConfirmationModal> = ({ isOpen = false, onC
 			};
 
 			pushNewMessage(newMessage, queryClient);
-		}
+		} */
 	}
 
 	if (!isOpen && !isModalVisible) {
@@ -235,7 +217,8 @@ const SwapConfirmationModal: FC<ISwapConfirmationModal> = ({ isOpen = false, onC
 						<Button width={'100%'} mdWidth={'50%'} onClick={onClose}>
 							Cancel
 						</Button>
-						{!!callData && !swapTx ? (
+
+						{needToIncreaseAllowance ? (
 							<Button
 								width={'100%'}
 								mdWidth={'50%'}
@@ -251,10 +234,11 @@ const SwapConfirmationModal: FC<ISwapConfirmationModal> = ({ isOpen = false, onC
 							<Button
 								width={'100%'}
 								mdWidth={'50%'}
-								onClick={!!swapTx ? () => executeSwap() : undefined}
+								//onClick={!!swapTx ? () => executeSwap() : undefined}
+								onClick={formattedSwapData?.isReady ? () => executeSwap() : undefined}
 								disabled={!formattedSwapData?.isReady}
 								gradientContainerProps={{
-									background: !!swapTx ? theme.colors.success : theme.colors.success + '20'
+									background: formattedSwapData?.isReady ? theme.colors.success : theme.colors.success + '20'
 								}}
 							>
 								Swap

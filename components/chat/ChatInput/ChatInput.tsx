@@ -1,6 +1,6 @@
 import { SwapConfirmationModal } from '@components/modals/SwapConfirmationModal/SwapConfirmationModal';
 import { Button } from '@components/shared/Button/Button';
-import { ENetwork } from '@contexts/SwapContext/SwapContext.enum';
+import { ENetwork } from '@contexts/Web3Context/Web3Context.enum';
 import { WALLETS } from '@contexts/Web3Context/Web3Context.variables';
 import { useDialogFlowMutation } from '@hooks/chat/useDialogFlowMutation/useDialogFlowMutation';
 import { pushNewMessage } from '@hooks/chat/useMessagesQuery/useMessagesQuery';

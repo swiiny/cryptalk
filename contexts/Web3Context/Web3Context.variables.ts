@@ -1,6 +1,6 @@
-import { ENetwork } from '@contexts/SwapContext/SwapContext.enum';
 import { INetwork } from '@interfaces/network';
 import { IWallet } from '@interfaces/wallet';
+import { ENetwork } from './Web3Context.enum';
 
 const WALLETS = {
 	metamask: {

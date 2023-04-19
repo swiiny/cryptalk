@@ -1,5 +1,5 @@
-import { ENetwork } from '@contexts/SwapContext/SwapContext.enum';
-import { ITokensByNetwork } from '@contexts/SwapContext/SwapContext.type';
+import { ENetwork } from '@contexts/Web3Context/Web3Context.enum';
+import { ITokensByNetwork } from '@contexts/Web3Context/Web3Context.type';
 
 export const tokens: ITokensByNetwork[] = [
 	{

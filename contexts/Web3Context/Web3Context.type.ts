@@ -2,6 +2,7 @@ import { IFormattedSwapData } from '@components/modals/SwapConfirmationModal/Swa
 import { IWallet } from '@interfaces/wallet';
 import Address from '@models/Address';
 import { providers } from 'ethers';
+import { ENetwork } from './Web3Context.enum';
 
 interface IWeb3 {
 	provider: IWeb3Provider;
@@ -26,4 +27,24 @@ interface IWeb3Provider {
 	error?: boolean;
 }
 
-export type { IWeb3Provider, IWeb3 };
+interface IToken {
+	symbol: string;
+	name: string;
+	address: string;
+	decimals: number;
+	logoURI?: string;
+	tags: string[];
+	eip2612?: boolean;
+	wrappedNative?: boolean;
+	synth?: boolean;
+	isFoT?: boolean;
+	domainVersion?: string;
+	displayedSymbol?: string;
+}
+
+interface ITokensByNetwork {
+	network: ENetwork;
+	tokens: IToken[];
+}
+
+export type { IWeb3Provider, IWeb3, IToken, ITokensByNetwork };

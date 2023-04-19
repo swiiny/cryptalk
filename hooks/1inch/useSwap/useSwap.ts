@@ -1,4 +1,4 @@
-import { IToken } from '@contexts/SwapContext/SwapContext.type';
+import { IToken } from '@contexts/Web3Context/Web3Context.type';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 

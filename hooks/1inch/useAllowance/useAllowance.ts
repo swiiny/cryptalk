@@ -28,7 +28,7 @@ function useAllowance(
 			);
 			return response.data;
 		},
-		enabled: !!tokenAddress && !!ownerAddress && !!spenderAddress && !swapReady,
+		enabled: !!tokenAddress && !!ownerAddress && !!spenderAddress,
 		refetchInterval: 3000
 	});
 
@@ -49,9 +49,8 @@ function useAllowance(
 	const isNative = tokenAddress?.toLowerCase() === '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
 
 	return {
-		isNative,
-		allowance,
-		callData: isNative ? undefined : allowanceCallData
+		callData: allowanceCallData,
+		needToIncreaseAllowance: !isNative && amount && parseInt(allowance) < parseInt(amount)
 	};
 }
 
