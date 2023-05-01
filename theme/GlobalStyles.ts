@@ -26,18 +26,18 @@ html {
   height: 100%;
 }
 
-#__next h1,
-#__next h2,
-#__next h3,
-#__next h4,
-#__next h5,
-#__next h6,
-#__next button,
-#__next span,
-#__next a,
-#__next p,
-#__next input,
-#__next textarea {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+button,
+span,
+a,
+p,
+input,
+textarea {
 	color: ${(p) => p.theme.colors.white};
 
 	margin: 0;
