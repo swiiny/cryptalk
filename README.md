@@ -10,3 +10,6 @@ Cryptalk is an innovative and user-centric platform, developed as part of the [E
 - Efficient and user-friendly execution of swaps
 - Comprehensive hooks and API integrations with [1inch](https://1inch.io/)
 - Integration of [MetaMaskSDK](https://metamask.io/sdk/) for wallet management
+
+## Prizes
+![image](https://github.com/JeremyTheintz/cryptalk/assets/61942008/44f84a55-74f5-4f26-ba16-c7680d19fbd8)
